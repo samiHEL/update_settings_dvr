@@ -5,6 +5,8 @@ import argparse
 import xml.etree.ElementTree as ET
 
 
+
+## MODIF RESOLUTION CAM FLUX PRIMAIRE OU SECONDAIRE
 def set_resolution(camera_ip, username, password, channel_id, resolution_width, resolution_height):
     # Remplacez ces valeurs par celles de votre caméra
     camera_ip = camera_ip
@@ -42,6 +44,7 @@ def set_resolution(camera_ip, username, password, channel_id, resolution_width, 
         print(f"Erreur : {response_put.status_code} - {response_put.text}")
 
 
+## MODIF FPS CAM ##
 def set_fps(camera_ip, username, password, channel_id, fps):
     # Remplacez ces valeurs par celles de votre caméra
     camera_ip = camera_ip
@@ -76,6 +79,8 @@ def set_fps(camera_ip, username, password, channel_id, fps):
     else:
         print(f"Erreur : {response_put.status_code} - {response_put.text}")
 
+
+## MODIF BITREATE CAM ##
 def set_bitrate(camera_ip, username, password, channel_id, BitRate):
   
     # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
@@ -108,9 +113,7 @@ def set_bitrate(camera_ip, username, password, channel_id, BitRate):
         print(f"Erreur : {response.status_code} - {response.text}")
 
 
-
-
-
+## Recuperer parametres globaux flux vidéo secondaire ou primaire ##
 def get_camera_parameters(camera_ip, username, password, channel_id):
     url_image_settings = f'http://{camera_ip}/ISAPI/Streaming/channels/{channel_id}/'
 
@@ -121,7 +124,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
         # Vérifier si la requête a réussi (code d'état 200)
         if response.status_code == 200:
             xml = response.text
-            print(xml)
+            #print(xml)
             root = ET.fromstring(xml)
 
             # Espaces de noms XML
@@ -154,6 +157,64 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
 
     except requests.RequestException as e:
         print(f"Erreur de requête : {e}")
+
+
+## Recuperer liste parametres flux vidéo secondaire ou primaire ##       
+def get_camera_parameters_unique(camera_ip, username, password, channel_id):
+    url_image_settings = f'http://{camera_ip}/ISAPI/Streaming/channels/{channel_id}/capabilities'
+    try:
+        # Effectuer une requête HTTP GET avec une authentification basique
+        response = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+
+        # Vérifier si la requête a réussi (code d'état 200)
+        if response.status_code == 200:
+
+            xml = response.text
+            
+            root = ET.fromstring(xml)
+            # Find the 'videoCodecType' element
+            ns = {'ns': 'http://www.hikvision.com/ver20/XMLSchema'}
+
+            videoCodecTypeElement = root.find('.//ns:videoCodecType', namespaces=ns)
+            videoCodec_opt = videoCodecTypeElement.attrib['opt']
+            #print(videoCodec_opt)
+
+            videoResolutionWidth = root.find('.//ns:videoResolutionWidth', namespaces=ns)
+            videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+            #print(videoResolutionWidth_opt)
+
+            videoResolutionHeight = root.find('.//ns:videoResolutionHeight', namespaces=ns)
+            videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+            #print(videoResolutionHeight_opt)
+
+            maxFrameRate = root.find('.//ns:maxFrameRate', namespaces=ns)
+            maxFrameRate_opt = maxFrameRate.attrib['opt']
+            # Diviser la chaîne en une liste de chaînes
+            string_list = maxFrameRate_opt.split(',')
+
+            # Convertir chaque élément de la liste en entier
+            int_list = [int(x) for x in string_list]
+            maxFrameRate_opt_list = [x / 100 for x in int_list]
+            maxFrameRate_opt_list.pop(0)
+            #print(maxFrameRate_opt)
+
+
+            constantBitRate = root.find('.//ns:constantBitRate', namespaces=ns)
+            constantBitRate_min = constantBitRate.attrib['min']
+            constantBitRate_max = constantBitRate.attrib['max']
+            constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+            #print(constantBitRate_opt)
+            
+
+            print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+
+        else:
+            print(f"Erreur : {response.status_code} - {response.text}")
+
+    except requests.RequestException as e:
+        print(f"Erreur de requête : {e}")
+
+
 def print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video):
     print('ID Channel :', id_channel)
     print('Width resolution : ', width_resolution)
@@ -162,6 +223,15 @@ def print_results(id_channel, width_resolution, height_resolution, type_bande_pa
     print('Image par seconde : ', int(image_par_sec)/100 ,' fps')
     print('Debit binaire max : ', debit_bin_max)
     print('Encodage_video : ', encodage_video)
+
+def print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt):
+    print('Video Codec :', videoCodec_opt)
+    print('Video Resolution Width :', videoResolutionWidth_opt)
+    print('Video Resolution Height :', videoResolutionHeight_opt)
+    print('FPS :', maxFrameRate_opt_list)
+    print('Bitrate :', constantBitRate_opt)
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -181,6 +251,10 @@ if __name__ == "__main__":
     if args.bitrate!=None:
         set_bitrate(args.camera_ip, args.username, args.password, args.channel_id, args.bitrate)
     else:
-        get_camera_parameters(args.camera_ip, args.username, args.password, args.channel_id)
+        get_camera_parameters_unique(args.camera_ip, args.username, args.password, args.channel_id)
 
-#python3 test_python_http.py --camera_ip 172.24.24.126 --username admin --password Hikvision --channel_id 102 --resolution_width 320 --resolution_height 240
+## exemple commande Liste parametres flux primaire ou secondaire##
+#python3 update_settings_dvr.py --camera_ip 172.24.1.105 --username admin --password Hikvision --channel_id 102
+
+## exemple commande PUT parametres flux primaire ou secondaire##
+##python3 update_settings_dvr.py --camera_ip 172.24.1.105 --username admin --password Hikvision --channel_id 102 --resolution_width 960 --resolution_height 576
