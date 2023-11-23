@@ -110,15 +110,20 @@ def getAllSettings(camera_ip, username, password):
                     target_line_bitrate = next(line for line in r.text.split('\n') if 'caps.ExtraFormat[0].Video.BitRateOptions' in line)
                     bitrate_types = target_line_bitrate.split('=')[1].strip()
                     print_results(compression_types,resolution_types,fps_types,bitrate_types) 
-def setResolution(camera_ip, username, password, channel_id, resolution):
+def setResolution(camera_ip, username, password, channel_id, flux,resolution):
     channel_id=int(channel_id)-1
+    if flux.lower()=="sub":   
+        resolution_com=f"Encode[{channel_id}].ExtraFormat[0].Video.resolution"
+    
+    else:
+        resolution_com=f"Encode[{channel_id}].MainFormat[0].Video.resolution"
     #password=password.encode(encoding="ascii",errors="ignore")
     ##ExtraFormat[0] Pour flux secondaire##
     ##MainFormat[0] Pour flux primaire##
     ## Numero Cam commence à 0 ##
     #width="Encode[10].ExtraFormat[0].Video.Width"
     #height="Encode[10].ExtraFormat[0].Video.Height"
-    resolution_com=f"Encode[{channel_id}].ExtraFormat[0].Video.resolution"
+    
     url_resolution = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
 
     print(url_resolution)
@@ -126,10 +131,14 @@ def setResolution(camera_ip, username, password, channel_id, resolution):
     print(r.status_code)
     if r.status_code == 200:
                     print(r.text) 
-def setFps(camera_ip, username, password, channel_id, fps):
+def setFps(camera_ip, username, password, channel_id,flux, fps):
     channel_id=int(channel_id)-1
-    password=password.encode(encoding="ascii",errors="ignore")
-    fps_cam=f"Encode[{channel_id}].ExtraFormat[0].Video.FPS"
+    if flux.lower()=="sub":   
+        fps_cam=f"Encode[{channel_id}].ExtraFormat[0].Video.FPS"
+    
+    else:
+        fps_cam=f"Encode[{channel_id}].MainFormat[0].Video.FPS"
+    
     url_fps = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
 
     print(url_fps)
@@ -137,10 +146,16 @@ def setFps(camera_ip, username, password, channel_id, fps):
     print(r.status_code)
     if r.status_code == 200:
                     print(r.text) 
-def setBitrate(camera_ip, username, password, channel_id, bitrate):
+def setBitrate(camera_ip, username, password, channel_id,flux, bitrate):
     channel_id=int(channel_id)-1
-    password=password.encode(encoding="ascii",errors="ignore")
-    bitrate_com=f"Encode[{channel_id}].ExtraFormat[0].Video.BitRate"
+
+    if flux.lower()=="sub":
+            
+        bitrate_com=f"Encode[{channel_id}].ExtraFormat[0].Video.BitRate"
+    
+    else:
+        bitrate_com=f"Encode[{channel_id}].MainFormat[0].Video.BitRate"
+    
     url_bitrate = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&{bitrate_com}={bitrate}"
 
     print(url_bitrate)
@@ -148,11 +163,18 @@ def setBitrate(camera_ip, username, password, channel_id, bitrate):
     print(r.status_code)
     if r.status_code == 200:
                     print(r.text) 
-def setCompression(camera_ip, username, password, channel_id, compression):
+def setCompression(camera_ip, username, password, channel_id,flux, compression):
     channel_id=int(channel_id)-1
-    password=password.encode(encoding="ascii",errors="ignore")
-    compression_com=f"Encode[{channel_id}].ExtraFormat[0].Video.Compression"
-    compression_main= f"Encode[{channel_id}].ExtraFormat[0].Video.Profile=Main"
+    if flux.lower()=="sub":
+            
+        compression_com=f"Encode[{channel_id}].ExtraFormat[0].Video.Compression"
+        compression_main= f"Encode[{channel_id}].ExtraFormat[0].Video.Profile=Main"
+    
+    else:
+        compression_com=f"Encode[{channel_id}].MainFormat[0].Video.Compression"
+        compression_main= f"Encode[{channel_id}].MainFormat[0].Video.Profile=Main"
+            
+    
     url_compression = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&{compression_com}={compression}"
     url_compression_main = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&{compression_main}"
 
@@ -161,7 +183,44 @@ def setCompression(camera_ip, username, password, channel_id, compression):
     r = requests.put(url_compression_main, stream=True, auth=HTTPDigestAuth(username, password))
     print(r.status_code)
     if r.status_code == 200:
+                    print(r.text)  
+
+
+def setEncryption(camera_ip, username, password):
+    #table.WLan.eth2.Encryption
+    url_encrypt = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.eth2.Encryption=On"
+    #url_encrypt = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=getConfig&name=WLan"
+    r = requests.put(url_encrypt, stream=True, auth=HTTPDigestAuth(username, password))
+    #r = requests.put(url_compression_main, stream=True, auth=HTTPDigestAuth(username, password))
+    print(r.status_code)
+    if r.status_code == 200:
                     print(r.text) 
+def setDetection(camera_ip, username, password,channel_id,motionDetect):
+    channel_id=int(channel_id)-1
+    channel_str=channel_id+1
+    url_detection=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{channel_id}].Enable={motionDetect.lower()}"
+    #print(url_detection)
+    r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
+    print(r.status_code)
+    if r.status_code == 200:
+                    print(r.text)
+                    print("Detection mouvement pour camera "+str(channel_str)+" mise à "+motionDetect.lower()) 
+def setEncrypt(camera_ip, username, password):
+    url_encrypt=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.Enable=true"
+    url_encrypt2=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.KeyFlag=true"
+    url_encrypt3=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.Encryption=On"
+    url_encrypt4=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=getConfig&name=WLan"
+    #print(url_detection)
+    r = requests.put(url_encrypt, stream=True, auth=HTTPDigestAuth(username, password))
+    r2 = requests.put(url_encrypt2, stream=True, auth=HTTPDigestAuth(username, password))
+    r3 = requests.put(url_encrypt3, stream=True, auth=HTTPDigestAuth(username, password))
+    r4 = requests.get(url_encrypt4, stream=True, auth=HTTPDigestAuth(username, password))
+    print(r4.status_code)
+    if r4.status_code == 200:
+
+                    
+                    print(r4.text)
+
 
 
 #getinfoCam()
@@ -175,20 +234,29 @@ def setCompression(camera_ip, username, password, channel_id, compression):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--camera_ip", type=str, required=True)
+    parser.add_argument("--ip", type=str, required=True)
     parser.add_argument("--username", type=str, required=True)
     parser.add_argument("--password", type=str, required=True)
-    parser.add_argument("--channel_id", type=int, required=False)
+    parser.add_argument("--channel", type=int, required=False)
     parser.add_argument("--resolution", type=str, required=False)
     parser.add_argument("--fps", type=int, required=False)
     parser.add_argument("--bitrate", type=int, required=False)
-    parser.add_argument("--compression", type=int, required=False)
+    parser.add_argument("--compression", type=str, required=False)
+    parser.add_argument("--flux", type=str, required=False)
+    parser.add_argument("--motionDetect", type=str, required=False)
+
     args = parser.parse_args()
     if args.resolution!=None:
-        setResolution(args.camera_ip, args.username, args.password, args.channel_id, args.resolution)
+        setResolution(args.ip, args.username, args.password, args.channel,args.flux, args.resolution)
     if args.fps!=None:
-        setFps(args.camera_ip, args.username, args.password, args.channel_id, args.fps)
+        setFps(args.ip, args.username, args.password, args.channel,args.flux, args.fps)
     if args.bitrate!=None:
-        setBitrate(args.camera_ip, args.username, args.password, args.channel_id, args.bitrate)
-    else:
-        getAllSettings(args.camera_ip, args.username, args.password)
+        setBitrate(args.ip, args.username, args.password, args.channel,args.flux, args.bitrate)
+    if args.compression!=None:
+        setCompression(args.ip, args.username, args.password, args.channel,args.flux, args.compression)
+    if args.motionDetect!=None:
+        setDetection(args.ip, args.username, args.password, args.channel,args.motionDetect)  
+    if args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
+        getAllSettings(args.ip, args.username, args.password)
+
+
