@@ -52,7 +52,7 @@ def set_resolution(camera_ip, username, password, channel_id, resolution):
 
             # Vérifier si la requête a réussi
             if response.status_code == 200:
-                print("Compression pour camera "+str(channel2)+" mise à "+str(resolution)) 
+                print("Resolution pour camera "+str(channel2)+" mise à "+str(resolution)) 
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
     else:
