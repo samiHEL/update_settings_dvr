@@ -319,8 +319,9 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                     xml = response.text
                     #print(xml)
                     root = ET.fromstring(xml)
-
-                    if ns is not None:
+                    namespace_uri = root.tag.split('}', 1)[0][1:]
+ 
+                    if namespace_uri in ns['ns'] :
                         id_channel = root.find('.//ns:channelName', namespaces=ns).text
                         width_resolution = root.find('.//ns:videoResolutionWidth', namespaces=ns).text
                         height_resolution = root.find('.//ns:videoResolutionHeight', namespaces=ns).text
@@ -341,7 +342,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                         else:
                             debit_bin_max = vbr_Upper_Cap  
                         encodage_video = root.find('.//ns:videoCodecType', namespaces=ns).text
-                    elif ns2 is not None:
+                    elif  namespace_uri in ns2['xmlns'] :
                         id_channel = root.find('.//xmlns:channelName', namespaces=ns2).text
                         width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns2).text
                         height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns2).text
@@ -362,7 +363,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                         except : 
                             debit_bin_max = vbr_Upper_Cap.text    
                         encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns2).text
-                    elif ns3 is not None:
+                    elif  namespace_uri in ns3['xmlns'] :
                         id_channel = root.find('.//xmlns:channelName', namespaces=ns3).text
                         width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns3).text
                         height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns3).text
@@ -383,7 +384,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                         except : 
                             debit_bin_max = vbr_Upper_Cap.text    
                         encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns3).text
-                    elif ns4 is not None:
+                    elif  namespace_uri in ns4['xmlns'] :
                         id_channel = root.find('.//xmlns:channelName', namespaces=ns4).text
                         width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns4).text
                         height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns4).text
@@ -424,8 +425,9 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                     xml = response.text
                     #print(xml)
                     root = ET.fromstring(xml)
+                    namespace_uri = root.tag.split('}', 1)[0][1:]
 
-                    if ns is not None:
+                    if namespace_uri in ns['ns'] :
                         try:
                             id_channel = root.find('.//ns:channelName', namespaces=ns).text
                             width_resolution = root.find('.//ns:videoResolutionWidth', namespaces=ns).text
@@ -451,7 +453,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             print("-----------")
                         except:
                             print(xml)
-                    elif ns2 is not None:
+                    elif  namespace_uri in ns2['xmlns'] :
                         try:
                             id_channel = root.find('.//xmlns:channelName', namespaces=ns2).text
                             width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns2).text
@@ -477,7 +479,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             print("-----------")
                         except:
                             print(xml)
-                    elif ns3 is not None:
+                    elif  namespace_uri in ns3['xmlns'] :
                         try:
                             id_channel = root.find('.//xmlns:channelName', namespaces=ns3).text
                             width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns3).text
@@ -503,7 +505,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             print("-----------")
                         except:
                             print(xml)
-                    elif ns4 is not None:
+                    elif  namespace_uri in ns4['xmlns'] :
                         try:
                             id_channel = root.find('.//xmlns:channelName', namespaces=ns4).text
                             width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns4).text
@@ -550,7 +552,9 @@ def get_camera_parameters_unique(camera_ip, username, password, ):
 
                 xml = response.text
                 root = ET.fromstring(xml)
-                if ns is not None:
+                namespace_uri = root.tag.split('}', 1)[0][1:]
+
+                if namespace_uri in ns['ns'] :
 
                     videoCodecTypeElement = root.find('.//ns:videoCodecType', namespaces=ns)
                     videoCodec_opt = videoCodecTypeElement.attrib['opt']
@@ -578,7 +582,7 @@ def get_camera_parameters_unique(camera_ip, username, password, ):
                     print("// Flux "+t[1]+" //")
                     print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
                     print("---------------------")
-                elif ns2 is not None:
+                elif  namespace_uri in ns2['xmlns'] :
                     videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns2)
                     videoCodec_opt = videoCodecTypeElement.attrib['opt']
 
@@ -606,7 +610,7 @@ def get_camera_parameters_unique(camera_ip, username, password, ):
                     print("// Flux "+t[1]+" //")
                     print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
                     print("---------------------")
-                elif ns3 is not None:
+                elif  namespace_uri in ns3['xmlns'] :
                     videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns3)
                     videoCodec_opt = videoCodecTypeElement.attrib['opt']
 
@@ -634,7 +638,7 @@ def get_camera_parameters_unique(camera_ip, username, password, ):
                     print("// Flux "+t[1]+" //")
                     print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
                     print("---------------------")
-                elif ns4 is not None:
+                elif  namespace_uri in ns4['xmlns'] :
                     videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns4)
                     videoCodec_opt = videoCodecTypeElement.attrib['opt']
 
