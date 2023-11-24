@@ -354,33 +354,37 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                 # Vérifier si la requête a réussi (code d'état 200)
                 if response.status_code == 200:
                     xml = response.text
+                    #print(xml)
                     root = ET.fromstring(xml)
 
                     # Espaces de noms XML
                     ns = {'ns': 'http://www.hikvision.com/ver20/XMLSchema'}
+                    try:
+                        id_channel = root.find('.//ns:channelName', namespaces=ns).text
+                        width_resolution = root.find('.//ns:videoResolutionWidth', namespaces=ns).text
+                        height_resolution = root.find('.//ns:videoResolutionHeight', namespaces=ns).text
+                        try :
+                            constant_bit_rate = root.find('.//ns:constantBitRate', namespaces=ns)
+                        except :
+                            constant_bit_rate = None   
 
-                    id_channel = root.find('.//ns:channelName', namespaces=ns).text
-                    width_resolution = root.find('.//ns:videoResolutionWidth', namespaces=ns).text
-                    height_resolution = root.find('.//ns:videoResolutionHeight', namespaces=ns).text
-                    try :
-                        constant_bit_rate = root.find('.//ns:constantBitRate', namespaces=ns)
-                    except :
-                        constant_bit_rate = None   
+                        try : 
+                            vbr_Upper_Cap =  root.find('.//ns:vbrUpperCap', namespaces=ns)
+                        except : 
+                            vbr_Upper_Cap =  None
+                        type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
+                        image_par_sec = root.find('.//ns:maxFrameRate', namespaces=ns).text
+                        try :
+                            debit_bin_max = constant_bit_rate.text 
+                        except : 
+                            debit_bin_max = vbr_Upper_Cap.text    
+                        encodage_video = root.find('.//ns:videoCodecType', namespaces=ns).text
 
-                    try : 
-                        vbr_Upper_Cap =  root.find('.//ns:vbrUpperCap', namespaces=ns)
-                    except : 
-                        vbr_Upper_Cap =  None
-                    type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
-                    image_par_sec = root.find('.//ns:maxFrameRate', namespaces=ns).text
-                    try :
-                        debit_bin_max = constant_bit_rate.text 
-                    except : 
-                        debit_bin_max = vbr_Upper_Cap.text    
-                    encodage_video = root.find('.//ns:videoCodecType', namespaces=ns).text
-
-                    print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
-                    print("-----------")
+                        print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
+                        print("-----------")
+                    except:
+                        print(xml)
+                
                 else:
                     print(f"Erreur : {response.status_code} - {response.text}")
 
@@ -599,7 +603,7 @@ def print_results(id_channel, width_resolution, height_resolution, type_bande_pa
 
 def print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt):
     print('Video Codec :', videoCodec_opt)
-    print('Video Resolution :', str(videoResolutionWidth_opt)+"x"+str(videoResolutionHeight_opt))
+    print('Video Resolution :', str(videoResolutionWidth_opt)+"//"+str(videoResolutionHeight_opt))
     print('FPS :', maxFrameRate_opt_list)
     print('Bitrate :', constantBitRate_opt)
 
