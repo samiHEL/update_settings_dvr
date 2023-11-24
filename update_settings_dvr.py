@@ -355,13 +355,13 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             constant_bit_rate = None
                         type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                         try:
-                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns2)
+                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns2).text
                         except:
                             vbr_Upper_Cap =  None
                         try :
-                            debit_bin_max = constant_bit_rate.text 
+                            debit_bin_max = constant_bit_rate
                         except : 
-                            debit_bin_max = vbr_Upper_Cap.text    
+                            debit_bin_max = vbr_Upper_Cap   
                         encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns2).text
                     elif  namespace_uri in ns3['xmlns'] :
                         id_channel = root.find('.//xmlns:channelName', namespaces=ns3).text
@@ -376,13 +376,13 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             constant_bit_rate = None
                         type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                         try:
-                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns3)
+                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns3).text
                         except:
                             vbr_Upper_Cap =  None
                         try :
-                            debit_bin_max = constant_bit_rate.text 
+                            debit_bin_max = constant_bit_rate 
                         except : 
-                            debit_bin_max = vbr_Upper_Cap.text    
+                            debit_bin_max = vbr_Upper_Cap   
                         encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns3).text
                     elif  namespace_uri in ns4['xmlns'] :
                         id_channel = root.find('.//xmlns:channelName', namespaces=ns4).text
@@ -397,13 +397,13 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             constant_bit_rate = None
                         type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                         try:
-                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns4)
+                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns4).text
                         except:
                             vbr_Upper_Cap =  None
                         try :
-                            debit_bin_max = constant_bit_rate.text 
+                            debit_bin_max = constant_bit_rate 
                         except : 
-                            debit_bin_max = vbr_Upper_Cap.text    
+                            debit_bin_max = vbr_Upper_Cap    
                         encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns4).text
 
                     print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
@@ -433,20 +433,20 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             width_resolution = root.find('.//ns:videoResolutionWidth', namespaces=ns).text
                             height_resolution = root.find('.//ns:videoResolutionHeight', namespaces=ns).text
                             try :
-                                constant_bit_rate = root.find('.//ns:constantBitRate', namespaces=ns)
+                                constant_bit_rate = root.find('.//ns:constantBitRate', namespaces=ns).text
                             except :
                                 constant_bit_rate = None   
 
                             try : 
-                                vbr_Upper_Cap =  root.find('.//ns:vbrUpperCap', namespaces=ns)
+                                vbr_Upper_Cap =  root.find('.//ns:vbrUpperCap', namespaces=ns).text
                             except : 
                                 vbr_Upper_Cap =  None
                             type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                             image_par_sec = root.find('.//ns:maxFrameRate', namespaces=ns).text
                             try :
-                                debit_bin_max = constant_bit_rate.text 
+                                debit_bin_max = constant_bit_rate
                             except : 
-                                debit_bin_max = vbr_Upper_Cap.text    
+                                debit_bin_max = vbr_Upper_Cap    
                             encodage_video = root.find('.//ns:videoCodecType', namespaces=ns).text
 
                             print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
@@ -459,20 +459,20 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns2).text
                             height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns2).text
                             try :
-                                constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns2)
+                                constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns2).text
                             except :
                                 constant_bit_rate = None   
 
                             try : 
-                                vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns2)
+                                vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns2).text
                             except : 
                                 vbr_Upper_Cap =  None
                             type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                             image_par_sec = root.find('.//xmlns:maxFrameRate', namespaces=ns2).text
                             try :
-                                debit_bin_max = constant_bit_rate.text 
+                                debit_bin_max = constant_bit_rate 
                             except : 
-                                debit_bin_max = vbr_Upper_Cap.text    
+                                debit_bin_max = vbr_Upper_Cap    
                             encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns2).text
 
                             print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
@@ -485,20 +485,20 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns3).text
                             height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns3).text
                             try :
-                                constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns3)
+                                constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns3).text
                             except :
                                 constant_bit_rate = None   
 
                             try : 
-                                vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns3)
+                                vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns3).text
                             except : 
                                 vbr_Upper_Cap =  None
                             type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                             image_par_sec = root.find('.//xmlns:maxFrameRate', namespaces=ns3).text
                             try :
-                                debit_bin_max = constant_bit_rate.text 
+                                debit_bin_max = constant_bit_rate
                             except : 
-                                debit_bin_max = vbr_Upper_Cap.text    
+                                debit_bin_max = vbr_Upper_Cap    
                             encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns3).text
 
                             print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
@@ -511,20 +511,20 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                             width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns4).text
                             height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns4).text
                             try :
-                                constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns4)
+                                constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns4).text
                             except :
                                 constant_bit_rate = None   
 
                             try : 
-                                vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns4)
+                                vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns4).text
                             except : 
                                 vbr_Upper_Cap =  None
                             type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                             image_par_sec = root.find('.//xmlns:maxFrameRate', namespaces=ns4).text
                             try :
-                                debit_bin_max = constant_bit_rate.text 
+                                debit_bin_max = constant_bit_rate 
                             except : 
-                                debit_bin_max = vbr_Upper_Cap.text    
+                                debit_bin_max = vbr_Upper_Cap    
                             encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns4).text
 
                             print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
