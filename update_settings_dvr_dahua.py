@@ -356,7 +356,7 @@ if __name__ == "__main__":
     parser.add_argument("--resolution", type=str, required=False)
     parser.add_argument("--fps", type=int, required=False)
     parser.add_argument("--bitrate", type=int, required=False)
-    parser.add_argument("-- ", type=str, required=False)
+    parser.add_argument("--compression", type=str, required=False)
     parser.add_argument("--motionDetect", type=str, required=False)
 
     args = parser.parse_args()
