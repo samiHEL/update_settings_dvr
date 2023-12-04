@@ -50,6 +50,7 @@ def numberCam(camera_ip, username, password):
             return dernier_chiffre+1
         else:
             print("nombre de camera introuvable")
+            return 40
 def getinfoCam(camera_ip, username, password):
     #url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
     #main = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].MainFormat[0]"
