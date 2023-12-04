@@ -374,5 +374,7 @@ if __name__ == "__main__":
         setDetection(args.ip, args.username, args.password, args.channel,args.motionDetect)  
     if args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
         getinfoCam(args.ip, args.username, args.password)
+    if args.channel==None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
+        getAllSettings(args.ip, args.username, args.password)
 
 
