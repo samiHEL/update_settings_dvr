@@ -3,8 +3,6 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 import base64
 import hashlib
 import re
-from io import StringIO
-from PIL import Image
 import argparse
 
 #url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/snapshot.cgi?channel=1"
@@ -358,7 +356,7 @@ if __name__ == "__main__":
     parser.add_argument("--resolution", type=str, required=False)
     parser.add_argument("--fps", type=int, required=False)
     parser.add_argument("--bitrate", type=int, required=False)
-    parser.add_argument("--compression", type=str, required=False)
+    parser.add_argument("-- ", type=str, required=False)
     parser.add_argument("--motionDetect", type=str, required=False)
 
     args = parser.parse_args()
@@ -372,7 +370,7 @@ if __name__ == "__main__":
         setCompression(args.ip, args.username, args.password, args.channel, args.compression)
     if args.motionDetect!=None:
         setDetection(args.ip, args.username, args.password, args.channel,args.motionDetect)  
-    if args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
+    if args.channel!=None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
         getinfoCam(args.ip, args.username, args.password)
     if args.channel==None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
         getAllSettings(args.ip, args.username, args.password)
