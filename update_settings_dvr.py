@@ -696,7 +696,7 @@ def get_param(camera_ip, username, password):
             print("Balise inputPort non trouvée dans le dernier VideoInputChannel.")
     else:
         print(f"Erreur : {response_get.status_code} - {response_get.text}")
-        return
+        return 40
 
     
 
