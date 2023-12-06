@@ -28,15 +28,15 @@ import argparse
 
 import subprocess
 
-# def install_python_nmap():
-#     try:
-#         subprocess.check_call(['pip', 'install', 'python-nmap'])
-#         print("python-nmap installé avec succès.")
-#     except subprocess.CalledProcessError:
-#         print("Erreur lors de l'installation de python-nmap.")
+def install_python_nmap():
+    try:
+        subprocess.check_call(['pip', 'install', 'python-nmap'])
+        print("python-nmap installé avec succès.")
+    except subprocess.CalledProcessError:
+        print("Erreur lors de l'installation de python-nmap.")
 
-# # Appel de la fonction pour installer python-nmap
-# install_python_nmap()
+# Appel de la fonction pour installer python-nmap
+install_python_nmap()
 import nmap
 import socket
 
