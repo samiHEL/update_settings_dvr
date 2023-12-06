@@ -27,6 +27,7 @@ import argparse
 #height="Encode[10].ExtraFormat[0].Video.Height"
 
 import subprocess
+import time
 
 def install_python_nmap():
     try:
@@ -37,6 +38,7 @@ def install_python_nmap():
 
 # Appel de la fonction pour installer python-nmap
 install_python_nmap()
+time.sleep(3)
 import nmap
 import socket
 
