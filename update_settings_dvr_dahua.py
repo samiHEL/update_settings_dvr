@@ -48,19 +48,11 @@ def install_timeout_decorator():
 # Appel de la fonction pour installer python-nmap
 install_python_nmap()
 install_timeout_decorator()
-time.sleep(3)
+time.sleep(5)
 
-
-try:
-    import nmap
-except ImportError:
-    print("Le module nmap n'est pas encore installé.")
-    nmap = importlib.reload(nmap)
-
-if nmap:
-    # Rechargez le module après l'installation
-    nmap = importlib.reload(nmap)
 import nmap
+
+#nmap = importlib.reload(nmap)
 import socket
 
 def scan_ports(target_ip):
@@ -77,16 +69,6 @@ def scan_ports(target_ip):
 
     return open_ports
 
-try:
-    import timeout_decorator
-except ImportError:
-    print("Le module nmap n'est pas encore installé.")
-    timeout_decorator = importlib.reload(timeout_decorator)
-
-if timeout_decorator:
-    # Rechargez le module après l'installation
-    timeout_decorator = importlib.reload(timeout_decorator)
-import timeout_decorator
 
 import timeout_decorator
 
