@@ -28,6 +28,7 @@ import argparse
 
 import subprocess
 import time
+import importlib
 
 def install_python_nmap():
     try:
@@ -49,6 +50,8 @@ install_python_nmap()
 install_timeout_decorator()
 time.sleep(3)
 
+importlib.reload(nmap)
+
 import nmap
 import socket
 
@@ -65,9 +68,10 @@ def scan_ports(target_ip):
                 open_ports.append(port)
 
     return open_ports
+importlib.reload(timeout_decorator)
 import timeout_decorator
 
-@timeout_decorator.timeout(30)
+@timeout_decorator.timeout(40)
 def is_http_port(camera_ip, username, password, port):
     url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].ExtraFormat[0]"
 
@@ -120,7 +124,6 @@ def numberCam(camera_ip, username, password):
             print(f"Le ports HTTP potentiel est: {potential_http_ports[0]}")
         else:
             print("Aucun port HTTP potentiel trouvé.")
-        port=potential_http_ports[0]
         url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
 
         r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
