@@ -50,8 +50,16 @@ install_python_nmap()
 install_timeout_decorator()
 time.sleep(3)
 
-importlib.reload(nmap)
 
+try:
+    import nmap
+except ImportError:
+    print("Le module nmap n'est pas encore installé.")
+    nmap = importlib.reload(nmap)
+
+if nmap:
+    # Rechargez le module après l'installation
+    nmap = importlib.reload(nmap)
 import nmap
 import socket
 
