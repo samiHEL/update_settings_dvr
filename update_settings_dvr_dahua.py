@@ -31,14 +31,24 @@ import time
 
 def install_python_nmap():
     try:
-        subprocess.check_call(['pip', 'install', 'python-nmap'])
+        subprocess.Popen(['pip', 'install', 'python-nmap']).communicate()
         print("python-nmap installé avec succès.")
     except subprocess.CalledProcessError:
         print("Erreur lors de l'installation de python-nmap.")
 
 # Appel de la fonction pour installer python-nmap
+def install_timeout_decorator():
+    try:
+        subprocess.Popen(['pip', 'install', 'timeout_decorator']).communicate()
+        print("timeout_decorator installé avec succès.")
+    except subprocess.CalledProcessError:
+        print("Erreur lors de l'installation de timeout_decorator.")
+
+# Appel de la fonction pour installer python-nmap
 install_python_nmap()
+install_timeout_decorator()
 time.sleep(3)
+
 import nmap
 import socket
 
@@ -55,7 +65,9 @@ def scan_ports(target_ip):
                 open_ports.append(port)
 
     return open_ports
+import timeout_decorator
 
+@timeout_decorator.timeout(30)
 def is_http_port(camera_ip, username, password, port):
     url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].ExtraFormat[0]"
 
@@ -86,10 +98,21 @@ def numberCam(camera_ip, username, password):
         open_ports=scan_ports(camera_ip)
         print(open_ports)
         potential_http_ports = []
+
+
         for port in open_ports:
-            if is_http_port(camera_ip, username, password, port):
-                potential_http_ports.append(port)
-                break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
+            try:
+                if is_http_port(camera_ip, username, password, port):
+                    potential_http_ports.append(port)
+                    break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
+            except timeout_decorator.timeout_decorator.TimeoutError:
+                print(f"L'itération pour le port {port} a pris trop de temps (plus de 30 secondes).")
+                # Ajoutez ici un code pour gérer le dépassement du temps, si nécessaire
+
+        # for port in open_ports:
+        #     if is_http_port(camera_ip, username, password, port):
+        #         potential_http_ports.append(port)
+        #         break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
 
         #potential_http_ports = [port for port in open_ports if is_http_port(camera_ip, username, password, port)]
 
