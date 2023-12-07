@@ -76,7 +76,18 @@ def scan_ports(target_ip):
                 open_ports.append(port)
 
     return open_ports
-importlib.reload(timeout_decorator)
+
+try:
+    import timeout_decorator
+except ImportError:
+    print("Le module nmap n'est pas encore installé.")
+    timeout_decorator = importlib.reload(timeout_decorator)
+
+if timeout_decorator:
+    # Rechargez le module après l'installation
+    timeout_decorator = importlib.reload(timeout_decorator)
+import timeout_decorator
+
 import timeout_decorator
 
 @timeout_decorator.timeout(40)
