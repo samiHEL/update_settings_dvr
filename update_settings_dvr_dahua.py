@@ -72,7 +72,7 @@ def scan_ports(target_ip):
 
 import timeout_decorator
 
-@timeout_decorator.timeout(40)
+@timeout_decorator.timeout(30)
 def is_http_port(camera_ip, username, password, port):
     url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].ExtraFormat[0]"
 

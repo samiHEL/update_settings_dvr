@@ -5,9 +5,10 @@ import argparse
 import xml.etree.ElementTree as ET
 
 ns = {'ns': 'http://www.hikvision.com/ver20/XMLSchema'}
-ns2 = {'xmlns': 'http://www.std-cgi.com/ver20/XMLSchema'}
-ns3 = {'xmlns': 'http://www.std-cgi.org/ver20/XMLSchema'}
-ns4 = {'xmlns': 'http://www.isapi.com/ver20/XMLSchema'}
+ns2 = {'xmlns': 'http://www.hikvision.com/ver20/XMLSchema'}
+ns3 = {'xmlns': 'http://www.std-cgi.com/ver20/XMLSchema'}
+ns4 = {'xmlns': 'http://www.std-cgi.org/ver20/XMLSchema'}
+ns5 = {'xmlns': 'http://www.isapi.com/ver20/XMLSchema'}
 
 
 
@@ -23,6 +24,7 @@ def install_python_nmap():
         print("Erreur lors de l'installation de python-nmap.")
 
 # Appel de la fonction pour installer python-nmap
+
 def install_timeout_decorator():
     try:
         subprocess.Popen(['pip', 'install', 'timeout_decorator']).communicate()
@@ -31,11 +33,17 @@ def install_timeout_decorator():
         print("Erreur lors de l'installation de timeout_decorator.")
 
 # Appel de la fonction pour installer python-nmap
+
 install_python_nmap()
 install_timeout_decorator()
 time.sleep(5)
+try:
+    import nmap
+except:
+    install_python_nmap()
+    import nmap
 
-import nmap
+
 
 #nmap = importlib.reload(nmap)
 import socket
@@ -54,10 +62,13 @@ def scan_ports(target_ip):
 
     return open_ports
 
+try:
+    import timeout_decorator
+except:
+    install_timeout_decorator()
+    import timeout_decorator
 
-import timeout_decorator
-
-@timeout_decorator.timeout(40)
+@timeout_decorator.timeout(30)
 def is_http_port(camera_ip, username, password, port):
     url = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101'
 
