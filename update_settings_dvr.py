@@ -16,68 +16,80 @@ import subprocess
 import time
 import importlib
 
-def install_python_nmap():
-    try:
-        subprocess.Popen(['pip', 'install', 'python-nmap']).communicate()
-        print("python-nmap installé avec succès.")
-    except subprocess.CalledProcessError:
-        print("Erreur lors de l'installation de python-nmap.")
+# def install_python_nmap():
+#     try:
+#         subprocess.Popen(['pip', 'install', 'python-nmap']).communicate()
+#         print("python-nmap installé avec succès.")
+#     except subprocess.CalledProcessError:
+#         print("Erreur lors de l'installation de python-nmap.")
 
-# Appel de la fonction pour installer python-nmap
+# # Appel de la fonction pour installer python-nmap
 
-def install_timeout_decorator():
-    try:
-        subprocess.Popen(['pip', 'install', 'timeout_decorator']).communicate()
-        print("timeout_decorator installé avec succès.")
-    except subprocess.CalledProcessError:
-        print("Erreur lors de l'installation de timeout_decorator.")
+# def install_timeout_decorator():
+#     try:
+#         subprocess.Popen(['pip', 'install', 'timeout_decorator']).communicate()
+#         print("timeout_decorator installé avec succès.")
+#     except subprocess.CalledProcessError:
+#         print("Erreur lors de l'installation de timeout_decorator.")
 
-# Appel de la fonction pour installer python-nmap
+# # Appel de la fonction pour installer python-nmap
 
-install_python_nmap()
-install_timeout_decorator()
-time.sleep(5)
-try:
-    import nmap
-except:
-    install_python_nmap()
-    import nmap
+# install_python_nmap()
+# install_timeout_decorator()
+
 
 
 
 #nmap = importlib.reload(nmap)
-import socket
+
+# def scan_ports(target_ip):
+#     nm = nmap.PortScanner()
+#     nm.scan(target_ip, arguments='-p 1-65535 --open')
+
+#     open_ports = []
+
+#     for host in nm.all_hosts():
+#         for proto in nm[host].all_protocols():
+#             lport = nm[host][proto].keys()
+#             for port in lport:
+#                 open_ports.append(port)
+
+#     return open_ports
+
 
 def scan_ports(target_ip):
-    nm = nmap.PortScanner()
-    nm.scan(target_ip, arguments='-p 1-65535 --open')
-
     open_ports = []
 
-    for host in nm.all_hosts():
-        for proto in nm[host].all_protocols():
-            lport = nm[host][proto].keys()
-            for port in lport:
+    # Exécute la commande Nmap avec les options spécifiées
+    command = ['nmap', target_ip, '-p', '1-65535', '--open']
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = process.communicate()
+
+    # Vérifie si l'exécution de la commande a réussi
+    if process.returncode == 0:
+        lines = output.decode('utf-8').split('\n')
+        for line in lines:
+            if '/tcp' in line:
+                port = int(line.split('/')[0])
                 open_ports.append(port)
+                print(f"Port {port} is open")
 
-    return open_ports
+        return open_ports
+    else:
+        print(f"Erreur lors de l'exécution de la commande Nmap: {error.decode('utf-8')}")
+        return None
 
-try:
-    import timeout_decorator
-except:
-    install_timeout_decorator()
-    import timeout_decorator
 
-@timeout_decorator.timeout(30)
+
 def is_http_port(camera_ip, username, password, port):
     url = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101'
 
     try:
-        r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
+        r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
         r.raise_for_status()
         print("test fonctionnel avec port  "+str(port))
         return True  # La connexion a réussi, donc c'est potentiellement un port HTTP
-    except (requests.exceptions.RequestException, socket.error):
+    except (requests.exceptions.RequestException):
         print("erreur avec port "+str(port))
         return False  # La connexion a échoué
 
@@ -762,7 +774,7 @@ def get_param(camera_ip, username, password):
             if is_http_port(camera_ip, username, password, port):
                 potential_http_ports.append(port)
                 break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
-        except timeout_decorator.timeout_decorator.TimeoutError:
+        except:
             print(f"L'itération pour le port {port} a pris trop de temps (plus de 30 secondes).")
             # Ajoutez ici un code pour gérer le dépassement du temps, si nécessaire
 
