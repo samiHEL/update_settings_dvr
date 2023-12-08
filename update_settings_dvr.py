@@ -82,7 +82,7 @@ def scan_ports(target_ip):
 
 
 def is_http_port(camera_ip, username, password, port):
-    url = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101'
+    url = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels'
 
     try:
         r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
