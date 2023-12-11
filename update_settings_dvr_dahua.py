@@ -73,7 +73,8 @@ def scan_ports(target_ip):
 
 
 def is_http_port(camera_ip, username, password, port):
-    url = f"http://www.google.com:{port}"
+    url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].ExtraFormat[0]"
+    url2 = f'http://www.google.com:{port}' 
 
     try:
         r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
@@ -81,8 +82,14 @@ def is_http_port(camera_ip, username, password, port):
         print("test fonctionnel avec port  "+str(port))
         return True  # La connexion a réussi, donc c'est potentiellement un port HTTP
     except (requests.exceptions.RequestException):
-        print("erreur avec port "+str(port))
-        return False  # La connexion a échoué
+        try:
+            r = requests.get(url2, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
+            r.raise_for_status()
+            print("test fonctionnel avec port  "+str(port))
+            return True
+        except:   
+            print("erreur avec port "+str(port))
+            return False  # La connexion a échoué
 
 
 
