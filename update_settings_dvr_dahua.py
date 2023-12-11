@@ -264,6 +264,7 @@ def setResolution(camera_ip, username, password, channel_id,resolution):
                     print(f"Erreur : {r.status_code} - {r.text}")
     else:
             channel_id=int(channel_id)-1
+            resolution_com=f"Encode[{channel_id}].ExtraFormat[0].Video.resolution"
             url_resolution = f"http://{channel_id}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
 
             print(url_resolution)
@@ -312,7 +313,7 @@ def setFps(camera_ip, username, password, channel_id, fps):
                     print(f"Erreur : {r.status_code} - {r.text}")
     else:
             channel_id=int(channel_id)-1
-            fps_cam=f"Encode[{channel_id}].MainFormat[0].Video.FPS"
+            fps_cam=f"Encode[{channel_id}].ExtraFormat[0].Video.FPS"
             url_fps = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
 
             print(url_fps)
@@ -358,7 +359,7 @@ def setBitrate(camera_ip, username, password, channel_id, bitrate):
                     print(f"Erreur : {r.status_code} - {r.text}")
     else:
             channel_id=int(channel_id)-1
-            bitrate_cam=f"Encode[{channel_id}].MainFormat[0].Video.BitRate"
+            bitrate_cam=f"Encode[{channel_id}].ExtraFormat[0].Video.BitRate"
             url_bitrate = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bitrate_cam}={bitrate}"
 
             print(url_bitrate)
@@ -410,8 +411,8 @@ def setCompression(camera_ip, username, password, channel_id, compression):
                     print(f"Erreur : {r.status_code} - {r.text}")
     else:
             channel_id=int(channel_id)-1
-            compression_cam=f"Encode[{channel_id}].MainFormat[0].Video.Compression"
-            compression_cam2=f"Encode[{channel_id}].MainFormat[0].Video.Profile=Main"
+            compression_cam=f"Encode[{channel_id}].ExtraFormat[0].Video.Compression"
+            compression_cam2=f"Encode[{channel_id}].ExtraFormat[0].Video.Profile=Main"
             url_compression = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{compression_cam}={compression}"
             url_compression_main = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{compression_cam2}"
             r = requests.put(url_compression, stream=True, auth=HTTPDigestAuth(username, password))
