@@ -30,25 +30,6 @@ import subprocess
 import time
 import importlib
 
-
-#nmap = importlib.reload(nmap)
-
-
-# def scan_ports(target_ip):
-#     nm = nmap.PortScanner()
-#     nm.scan(target_ip, arguments='-p 1-65535 --open')
-
-#     open_ports = []
-
-#     for host in nm.all_hosts():
-#         for proto in nm[host].all_protocols():
-#             lport = nm[host][proto].keys()
-#             for port in lport:
-#                 open_ports.append(port)
-
-#     return open_ports
-
-
 def scan_ports(target_ip):
     open_ports = []
 
@@ -270,7 +251,7 @@ def setResolution(camera_ip, username, password, channel_id,resolution):
             print(x+1)
         
             if channel_id.lower()=="all_sub":   
-                resolution_com=f"Encode[{x}].ExtraFormat[0].Video.resolution"
+                resolution_com=f"Encode["+str(x)+"].ExtraFormat[0].Video.resolution"
                 url_resolution = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
                 r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password)) 
                 if r.status_code == 200:
@@ -321,7 +302,8 @@ def setFps(camera_ip, username, password, channel_id, fps):
             print(x+1)
         
             if channel_id.lower()=="all_sub":   
-                fps_cam=f"Encode[{x}].ExtraFormat[0].Video.FPS"
+                fps_cam=f"Encode["+str(x)+"].ExtraFormat[0].Video.FPS"
+
                 url_fps = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
                 r = requests.put(url_fps, stream=True, auth=HTTPDigestAuth(username, password)) 
                 print(r.status_code)
@@ -423,7 +405,7 @@ def setCompression(camera_ip, username, password, channel_id, compression):
                 r2 = requests.put(url_compression_main, stream=True, auth=HTTPDigestAuth(username, password))
                 print(r.status_code)
                 if r.status_code == 200:
-                                print("BitRate pour camera "+str(x+1)+" mise à "+str(compression))
+                                print("Compression pour camera "+str(x+1)+" mise à "+str(compression))
                 elif r.status_code == 400:
                     print("Pas bon format !")
                 else : 
@@ -439,7 +421,7 @@ def setCompression(camera_ip, username, password, channel_id, compression):
                 r2 = requests.put(url_compression_main, stream=True, auth=HTTPDigestAuth(username, password))
                 print(r.status_code)
                 if r.status_code == 200:
-                                print("BitRate pour camera "+str(x+1)+" mise à "+str(compression))
+                                print("Compression pour camera "+str(x+1)+" mise à "+str(compression))
                 elif r.status_code == 400:
                     print("Pas bon format !")
                 else : 
@@ -454,7 +436,7 @@ def setCompression(camera_ip, username, password, channel_id, compression):
             r2 = requests.put(url_compression_main, stream=True, auth=HTTPDigestAuth(username, password))
             print(r.status_code)
             if r.status_code == 200:
-                            print("BitRate pour camera "+str(channel_id+1)+" mise à "+str(compression))
+                            print("Compression pour camera "+str(channel_id+1)+" mise à "+str(compression))
             elif r.status_code == 400:
                 print("Pas bon format !")
             else : 
@@ -471,15 +453,39 @@ def setEncryption(camera_ip, username, password):
     if r.status_code == 200:
                     print(r.text) 
 def setDetection(camera_ip, username, password,channel_id,motionDetect):
-    channel_id=int(channel_id)-1
-    channel_str=channel_id+1
-    url_detection=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{channel_id}].Enable={motionDetect.lower()}"
-    #print(url_detection)
-    r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
-    print(r.status_code)
-    if r.status_code == 200:
+    number=numberCam(camera_ip, username, password)
+    port=number[1]
+    if "all" in channel_id:
+        for x in range(int(number[0])):
+            print(x+1)
+        
+            if channel_id.lower()=="all_sub" or channel_id.lower()=="all_main":   
+
+                url_detection=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{x}].Enable={motionDetect.lower()}"
+                #print(url_detection)
+                r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
+                print(r.status_code)
+                if r.status_code == 200:
                     print(r.text)
-                    print("Detection mouvement pour camera "+str(channel_str)+" mise à "+motionDetect.lower()) 
+                    print("Detection mouvement pour camera "+str(x+1)+" mise à "+motionDetect.lower()) 
+                elif r.status_code == 400:
+                    print("Pas bon format !")
+                else : 
+                    print(f"Erreur : {r.status_code} - {r.text}")
+                    
+    else:
+            channel_id=int(channel_id)-1
+            channel_str=channel_id+1
+            url_detection=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{channel_id}].Enable={motionDetect.lower()}"
+            r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
+            print(r.status_code)
+            if r.status_code == 200:
+                print(r.text)
+                print("Detection mouvement pour camera "+str(channel_str)+" mise à "+motionDetect.lower()) 
+            elif r.status_code == 400:
+                print("Pas bon format !")
+            else : 
+                print(f"Erreur : {r.status_code} - {r.text}")
 def setEncrypt(camera_ip, username, password):
     url_encrypt=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.Enable=true"
     url_encrypt2=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.KeyFlag=true"
@@ -505,29 +511,29 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, required=True)
-    parser.add_argument("--username", type=str, required=True)
-    parser.add_argument("--password", type=str, required=True)
-    parser.add_argument("--channel", type=str, required=False)
-    parser.add_argument("--resolution", type=str, required=False)
-    parser.add_argument("--fps", type=int, required=False)
-    parser.add_argument("--bitrate", type=int, required=False)
-    parser.add_argument("--compression", type=str, required=False)
-    parser.add_argument("--motionDetect", type=str, required=False)
+    parser.add_argument("--u", type=str, required=True)
+    parser.add_argument("--p", type=str, required=True)
+    parser.add_argument("--ch", type=str, required=False)
+    parser.add_argument("--r", type=str, required=False)
+    parser.add_argument("--f", type=int, required=False)
+    parser.add_argument("--b", type=int, required=False)
+    parser.add_argument("--c", type=str, required=False)
+    parser.add_argument("--m", type=str, required=False)
 
     args = parser.parse_args()
-    if args.resolution!=None:
-        setResolution(args.ip, args.username, args.password, args.channel, args.resolution)
-    if args.fps!=None:
-        setFps(args.ip, args.username, args.password, args.channel, args.fps)
-    if args.bitrate!=None:
-        setBitrate(args.ip, args.username, args.password, args.channel, args.bitrate)
-    if args.compression!=None:
-        setCompression(args.ip, args.username, args.password, args.channel, args.compression)
-    if args.motionDetect!=None:
-        setDetection(args.ip, args.username, args.password, args.channel,args.motionDetect)  
-    if args.channel!=None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
-        getinfoCam(args.ip, args.username, args.password,args.channel)
-    if args.channel==None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
-        getAllSettings(args.ip, args.username, args.password)
+    if args.r!=None:
+        setResolution(args.ip, args.u, args.p, args.ch, args.r)
+    if args.f!=None:
+        setFps(args.ip, args.u, args.p, args.ch, args.f)
+    if args.b!=None:
+        setBitrate(args.ip, args.u, args.p, args.ch, args.b)
+    if args.c!=None:
+        setCompression(args.ip, args.u, args.p, args.ch, args.c)
+    if args.m!=None:
+        setDetection(args.ip, args.u, args.p, args.ch,args.m)  
+    if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+        getinfoCam(args.ip, args.u, args.p,args.ch)
+    if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+        getAllSettings(args.ip, args.u, args.p)
 
 

@@ -1,46 +1,46 @@
 # update_settings_dvr
 
 ### Exemple commande pour une camera : 
-python3 update_settings_dvr.py --ip xxx --username admin --password Hikvision --channel 102 --resolution 320x240 
+python3 update_settings_dvr.py --ip xxx --u admin --p Hikvision --ch 102 --r 320x240 
 
 ### Exemple commande pour toute les cameras : 
 
-python3 update_settings_dvr.py --ip xxx --username admin --password Hikvision --channel all_sub --resolution 320x240 
+python3 update_settings_dvr.py --ip xxx --u admin --p Hikvision --ch all_sub --r 320x240 
 
 ### Pour obtenir liste parametres cam dispo lancer :
 
-python3 update_settings_dvr.py --ip xxx --username admin --password Hikvision 
+python3 update_settings_dvr.py --ip xxx --u admin --p Hikvision 
 
 ### Pour obtenir Listes cameras sur dvr :
 
-python3 update_settings_dvr.py --ip xxx --username admin --password Hikvision --channel (101,102,all_main, all_sub etc)
+python3 update_settings_dvr.py --ip xxx --u admin --p Hikvision --ch (101,102,all_main, all_sub etc)
 
 ## parametre possible :
 
 --ip OBLIGATOIRE 
 
---username OBLIGATOIRE
+--u OBLIGATOIRE (user)
 
---password OBLIGATOIRE
+--p OBLIGATOIRE (password)
 
---channel (101,102,201 etc ...) OU (all_main / all_sub)
+--ch (101,102,201 etc ...) OU (all_main / all_sub)
 
 
---resolution (320x240 par ex)
+--r (320x240 par ex) (resolution)
 
---fps 
+--f (fps) 
 
---bitrate
+--b (bitrate)
 
---compression (H.264,H.265)
+--c (H.264,H.265) (compression)
 
---motionDetect (false ou true)
+--m (false ou true) (motionDetect)
 
 
 # update_settings_dvr_Dahua
 
 ### Exemple commande : 
-python3 update_settings_dvr_dahua.py --ip xxx --username admin --password Dahua123 --channel_id 10 --resolution 704x576 
+python3 update_settings_dvr_dahua.py --ip xxx --u admin --p Dahua123 --ch 10 --r 704x576 
 
 Id des cameras sont ici sous la forme 1,2,3 etc 
 Le code update le flux secondaire par défaut
@@ -49,22 +49,22 @@ Le code update le flux secondaire par défaut
 
 --ip OBLIGATOIRE 
 
---username OBLIGATOIRE 
+--u OBLIGATOIRE 
 
---password OBLIGATOIRE 
+--p OBLIGATOIRE 
 
 
---channel (1,2,3,4 OU all_main / all_sub etc )
+--ch (1,2,3,4 OU all_main / all_sub etc )
 
---resolution (704x576 par exemple)
+--r (704x576 par exemple)
 
---fps 
+--f 
 
---bitrate (1024 par exemple)
+--b (1024 par exemple)
 
---compression (H.264,H.265)
+--c (H.264,H.265)
 
---motionDetect (false ou true)
+--m (false ou true)
 
 
 

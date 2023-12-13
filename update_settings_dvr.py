@@ -16,46 +16,6 @@ import subprocess
 import time
 import importlib
 
-# def install_python_nmap():
-#     try:
-#         subprocess.Popen(['pip', 'install', 'python-nmap']).communicate()
-#         print("python-nmap installé avec succès.")
-#     except subprocess.CalledProcessError:
-#         print("Erreur lors de l'installation de python-nmap.")
-
-# # Appel de la fonction pour installer python-nmap
-
-# def install_timeout_decorator():
-#     try:
-#         subprocess.Popen(['pip', 'install', 'timeout_decorator']).communicate()
-#         print("timeout_decorator installé avec succès.")
-#     except subprocess.CalledProcessError:
-#         print("Erreur lors de l'installation de timeout_decorator.")
-
-# # Appel de la fonction pour installer python-nmap
-
-# install_python_nmap()
-# install_timeout_decorator()
-
-
-
-
-#nmap = importlib.reload(nmap)
-
-# def scan_ports(target_ip):
-#     nm = nmap.PortScanner()
-#     nm.scan(target_ip, arguments='-p 1-65535 --open')
-
-#     open_ports = []
-
-#     for host in nm.all_hosts():
-#         for proto in nm[host].all_protocols():
-#             lport = nm[host][proto].keys()
-#             for port in lport:
-#                 open_ports.append(port)
-
-#     return open_ports
-
 
 def scan_ports(target_ip):
     open_ports = []
@@ -211,7 +171,7 @@ def set_fps(camera_ip, username, password, channel_id, fps):
 
             # Vérifier si la requête a réussi
             if response.status_code == 200:
-                print("Compression pour camera "+str(channel2)+" mise à "+str(fps)) 
+                print("Fps pour camera "+str(channel2)+" mise à "+str(fps)) 
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
     else:
@@ -285,7 +245,7 @@ def set_bitrate(camera_ip, username, password, channel_id, BitRate):
 
             # Vérifier si la requête a réussi
             if response.status_code == 200:
-                print("Compression pour camera "+str(channel2)+" mise à "+str(BitRate)) 
+                print("Bitrate pour camera "+str(channel2)+" mise à "+str(BitRate)) 
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
     else:
@@ -643,6 +603,7 @@ def get_camera_parameters_unique(camera_ip, username, password):
             if response.status_code == 200:
 
                 xml = response.text
+                print(xml)
                 root = ET.fromstring(xml)
                 namespace_uri = root.tag.split('}', 1)[0][1:]
 
@@ -820,11 +781,15 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect):
     number=get_param(camera_ip, username, password)
     port=number[1]
     # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-    if channel_id=="all":
+    if "all" in channel_id:
        
         for x in range(int(number[0])):
-            channel_id=x+1
-            url_image_settings = f'http://{camera_ip}:{port}/ISAPI/System/Video/inputs/channels/{channel_id}/MotionDetection'
+            print(x+1)
+            if channel_id=="all_main":
+                channel2=x+1
+            elif channel_id=="all_sub":
+                channel2=x+1
+            url_image_settings = f'http://{camera_ip}:{port}/ISAPI/System/Video/inputs/channels/{channel2}/MotionDetection'
 
             # Effectuer une requête HTTP GET
             response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
@@ -832,8 +797,8 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect):
             # Vérifier si la requête a réussi
             if response_get.status_code == 200:
                 xml = response_get.text
-                # print(xml)
-                # print("------------------------------")
+                print(xml)
+                print("------------------------------")
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
                 return
@@ -903,32 +868,31 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, required=True)
-    parser.add_argument("--username", type=str, required=True)
-    parser.add_argument("--password", type=str, required=True)
-    parser.add_argument("--channel", type=str, required=False)
-    parser.add_argument("--resolution", type=str, required=False)
-    parser.add_argument("--fps", type=int, required=False)
-    parser.add_argument("--bitrate", type=int, required=False)
-    parser.add_argument("--compression", type=str, required=False)
-    parser.add_argument("--motionDetect", type=str, required=False)
+    parser.add_argument("--u", type=str, required=True)
+    parser.add_argument("--p", type=str, required=True)
+    parser.add_argument("--ch", type=str, required=False)
+    parser.add_argument("--r", type=str, required=False)
+    parser.add_argument("--f", type=int, required=False)
+    parser.add_argument("--b", type=int, required=False)
+    parser.add_argument("--c", type=str, required=False)
+    parser.add_argument("--m", type=str, required=False)
 
     args = parser.parse_args()
-    if args.resolution!=None:
-        set_resolution(args.ip, args.username, args.password, args.channel, args.resolution)
-    if args.fps!=None:
-        set_fps(args.ip, args.username, args.password, args.channel, args.fps)
-    if args.bitrate!=None:
-        set_bitrate(args.ip, args.username, args.password, args.channel, args.bitrate)
-    if args.compression!=None:
-        set_compression(args.ip, args.username, args.password, args.channel, args.compression)
-    if args.motionDetect!=None:
-        set_motion(args.ip, args.username, args.password, args.channel, args.motionDetect)
-    if args.channel!=None and args.resolution==None and args.fps==None and args.bitrate==None and args.compression==None and args.motionDetect==None:
-        get_camera_parameters(args.ip, args.username, args.password, args.channel)
-    if args.channel==None and args.resolution==None and args.fps==None and args.bitrate==None and args.compression==None and args.motionDetect==None:
-        get_camera_parameters_unique(args.ip, args.username, args.password)
-        #set_motion_all(args.ip, args.username, args.password, "false")
-        #get_param(args.ip, args.username, args.password)
+    if args.r!=None:
+        set_resolution(args.ip, args.u, args.p, args.ch, args.r)
+    if args.f!=None:
+        set_fps(args.ip, args.u, args.p, args.ch, args.f)
+    if args.b!=None:
+        set_bitrate(args.ip, args.u, args.p, args.ch, args.b)
+    if args.c!=None:
+        set_compression(args.ip, args.u, args.p, args.ch, args.c)
+    if args.m!=None:
+        set_motion(args.ip, args.u, args.p, args.ch, args.m)
+    if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+        get_camera_parameters(args.ip, args.u, args.p, args.ch)
+    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+        get_camera_parameters_unique(args.ip, args.u, args.p)
+
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
 #python3 update_settings_dvr.py --camera_ip 172.24.1.105 --username admin --password Hikvision --channel_id 102
