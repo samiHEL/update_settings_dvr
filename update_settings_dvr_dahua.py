@@ -94,7 +94,7 @@ def numberCam(camera_ip, username, password,protocol="http"):
 
         for port in open_ports:
             try:
-                if is_http_port(camera_ip, username, password, port):
+                if is_http_port(camera_ip, username, password, port,protocol):
                     potential_http_ports.append(port)
                     break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
             except:
@@ -146,7 +146,7 @@ def numberCam(camera_ip, username, password,protocol="http"):
                        
                       
 def getinfoCam(camera_ip, username, password, channel_id,protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password,protocol)
     port=number[1]
 
     for x in range(int(number[0])):
@@ -182,7 +182,7 @@ def getinfoCam(camera_ip, username, password, channel_id,protocol="http"):
                                 print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
 
 def getAllSettings(camera_ip, username, password, protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password,protocol)
     port=number[1]
     url = f"{protocol}://{camera_ip}:{port}/cgi-bin/encode.cgi?action=getConfigCaps"
     r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password)) 
@@ -244,7 +244,7 @@ def getAllSettings(camera_ip, username, password, protocol="http"):
                         print("-----------")
 
 def setResolution(camera_ip, username, password, channel_id,resolution,protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password,protocol)
     port=number[1]
     if "all" in channel_id:
         for x in range(int(number[0])):
@@ -298,7 +298,7 @@ def setResolution(camera_ip, username, password, channel_id,resolution,protocol=
 
     
 def setFps(camera_ip, username, password, channel_id, fps,protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password, protocol)
     port=number[1]
     if "all" in channel_id:
         for x in range(int(number[0])):
@@ -347,7 +347,7 @@ def setFps(camera_ip, username, password, channel_id, fps,protocol="http"):
                     print(f"Erreur : {r.status_code} - {r.text}")
 
 def setBitrate(camera_ip, username, password, channel_id, bitrate, protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password, protocol)
     port=number[1]
     if "all" in channel_id:
         for x in range(int(number[0])):
@@ -393,7 +393,7 @@ def setBitrate(camera_ip, username, password, channel_id, bitrate, protocol="htt
                     print(f"Erreur : {r.status_code} - {r.text}")
 
 def setCompression(camera_ip, username, password, channel_id, compression,protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password, protocol)
     port=number[1]
     if "all" in channel_id:
         for x in range(int(number[0])):
@@ -456,7 +456,7 @@ def setEncryption(camera_ip, username, password):
     if r.status_code == 200:
                     print(r.text) 
 def setDetection(camera_ip, username, password,channel_id,motionDetect, protocol="http"):
-    number=numberCam(camera_ip, username, password)
+    number=numberCam(camera_ip, username, password, protocol)
     port=number[1]
     if "all" in channel_id:
         for x in range(int(number[0])):
@@ -522,7 +522,7 @@ if __name__ == "__main__":
     parser.add_argument("--b", type=int, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
-    parser.add_argument("--ptc", type=str, required=False)
+    parser.add_argument("--ptc", type=str, required=True)
 
     args = parser.parse_args()
     if args.r!=None:
