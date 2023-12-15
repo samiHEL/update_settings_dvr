@@ -4,7 +4,6 @@ import base64
 import hashlib
 import re
 import argparse
-
 #url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/snapshot.cgi?channel=1"
 #ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
 ##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
@@ -86,6 +85,18 @@ def print_results_cam(compression_types,resolution_types,fps_types,bitrate_types
     print('Resolution_types: ', resolution_types)
     print('Fps_types : ', fps_types)
     print('Bitrate_types: ', bitrate_types.replace(",","-"))
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import base64
+import urllib.request
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+import ssl
+import urllib.request
+ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 def numberCam(camera_ip, username, password,protocol="http"):
         open_ports=scan_ports(camera_ip)
         print(open_ports)
@@ -101,22 +112,29 @@ def numberCam(camera_ip, username, password,protocol="http"):
                 print(f"L'itération pour le port {port} a pris trop de temps (plus de 30 secondes).")
                 # Ajoutez ici un code pour gérer le dépassement du temps, si nécessaire
 
-        # for port in open_ports:
-        #     if is_http_port(camera_ip, username, password, port):
-        #         potential_http_ports.append(port)
-        #         break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
-
-        #potential_http_ports = [port for port in open_ports if is_http_port(camera_ip, username, password, port)]
-
         if potential_http_ports:
             print(f"Le ports HTTP potentiel est: {potential_http_ports[0]}")
         else:
             print("Aucun port HTTP potentiel trouvé.")
-        url = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
+        # Encode les informations d'identification
+        credentials = base64.b64encode(f"{username}:{password}".encode('utf-8')).decode('utf-8')
 
-        r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
-        t=r.text
-        matches = re.findall(r'table\.Ptz\[(\d+)\]', t)
+        # Construit l'en-tête d'authentification
+        headers = {
+         "Authorization": f"Basic {credentials}"
+        }
+
+        url = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
+        data = urlencode({}).encode('utf-8')
+
+        try:
+           # Effectue la requête avec l'en-tête d'authentification
+          request = urllib.request.Request(url, data=data, headers=headers)
+          with urllib.request.urlopen(request, context=ssl_context) as response:
+            content = response.read().decode('utf-8')
+        except HTTPError as e:
+            print(f"Error: {e}")
+        matches = re.findall(r'table\.Ptz\[(\d+)\]', content)
 
         # Obtenir le dernier chiffre trouvé
         if matches:
@@ -125,6 +143,12 @@ def numberCam(camera_ip, username, password,protocol="http"):
         else:
             print("nombre de camera introuvable")
             return [40,port]
+
+
+
+
+      
+
             # print("/// Port 80 indisponnible -> Test en cours avec autre port ...")
             # for port in open_ports:
             #     url_test=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
@@ -151,20 +175,37 @@ def getinfoCam(camera_ip, username, password, channel_id,protocol="http"):
 
     for x in range(int(number[0])):
             if channel_id=="all_sub":
-                sub = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
-                r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
-                print(r.status_code)
-                if r.status_code == 200:
-                                print("-----")
-                                target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
-                                compression_types = target_line_compression.split('=')[1].strip()
-                                target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
-                                resolution_types = target_line_resolution.split('=')[1].strip()
-                                target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
-                                fps_types = target_line_fps.split('=')[1].strip()
-                                target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
-                                bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                # sub = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
+                # r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
+                # print(r.status_code)
+                credentials = base64.b64encode(f"{username}:{password}".encode('utf-8')).decode('utf-8')
+                # Construit l'en-tête d'authentification
+                headers = {
+                "Authorization": f"Basic {credentials}"
+                }
+
+                url = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
+                data = urlencode({}).encode('utf-8')
+
+                try:
+                    # Effectue la requête avec l'en-tête d'authentification
+                    request = urllib.request.Request(url, data=data, headers=headers)
+                    with urllib.request.urlopen(request, context=ssl_context) as response:
+                        r = response.read().decode('utf-8')
+               
+                        if response.status == 200:
+                                        print("-----")
+                                        target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
+                                        compression_types = target_line_compression.split('=')[1].strip()
+                                        target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
+                                        resolution_types = target_line_resolution.split('=')[1].strip()
+                                        target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
+                                        fps_types = target_line_fps.split('=')[1].strip()
+                                        target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
+                                        bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                except HTTPError as e:
+                        print(f"Error: {e}")
             if channel_id=="all_main":
                 sub = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].MainFormat[0]"
                 r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
