@@ -184,7 +184,7 @@ def getinfoCam(camera_ip, username, password, channel_id,protocol="http"):
                 "Authorization": f"Basic {credentials}"
                 }
 
-                url = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
+                url = f"{protocol}://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
                 data = urlencode({}).encode('utf-8')
 
                 try:
@@ -192,16 +192,15 @@ def getinfoCam(camera_ip, username, password, channel_id,protocol="http"):
                     request = urllib.request.Request(url, data=data, headers=headers)
                     with urllib.request.urlopen(request, context=ssl_context) as response:
                         r = response.read().decode('utf-8')
-               
                         if response.status == 200:
                                         print("-----")
-                                        target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
+                                        target_line_compression = next(line for line in r.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
                                         compression_types = target_line_compression.split('=')[1].strip()
-                                        target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
+                                        target_line_resolution = next(line for line in r.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
                                         resolution_types = target_line_resolution.split('=')[1].strip()
-                                        target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
+                                        target_line_fps = next(line for line in r.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
                                         fps_types = target_line_fps.split('=')[1].strip()
-                                        target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
+                                        target_line_bitrate = next(line for line in r.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
                                         bitrate_types = target_line_bitrate.split('=')[1].strip()
                                         print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
                 except HTTPError as e:
