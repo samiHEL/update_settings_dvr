@@ -17,6 +17,20 @@ import time
 import importlib
 
 
+
+def expand_ip_range(ip_range):
+    ip_list = []
+    match = re.match(r'^(\d+\.\d+\.\d+\.)\{([\d,]+)\}$', ip_range)
+    
+    if match:
+        prefix = match.group(1)
+        numbers = match.group(2).split(',')
+        
+        for num in numbers:
+            ip_list.append(prefix + num)
+    
+    return ip_list
+
 def scan_ports(target_ip):
     open_ports = []
 
@@ -780,7 +794,7 @@ def get_param(camera_ip, username, password):
             print("Balise inputPort non trouvée dans le dernier VideoInputChannel.")
     else:
         print(f"Erreur : {response_get.status_code} - {response_get.text}")
-        return [40,port]
+        return [1,port]
 
     
 
@@ -885,20 +899,39 @@ if __name__ == "__main__":
     parser.add_argument("--m", type=str, required=False)
 
     args = parser.parse_args()
-    if args.r!=None:
-        set_resolution(args.ip, args.u, args.p, args.ch, args.r)
-    if args.f!=None:
-        set_fps(args.ip, args.u, args.p, args.ch, args.f)
-    if args.b!=None:
-        set_bitrate(args.ip, args.u, args.p, args.ch, args.b)
-    if args.c!=None:
-        set_compression(args.ip, args.u, args.p, args.ch, args.c)
-    if args.m!=None:
-        set_motion(args.ip, args.u, args.p, args.ch, args.m)
-    if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
-        get_camera_parameters(args.ip, args.u, args.p, args.ch)
-    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
-        get_camera_parameters_unique(args.ip, args.u, args.p)
+    if "{" in args.ip :
+        ip_list = expand_ip_range(args.ip)
+        print(ip_list)
+        for ip in ip_list:
+                if args.r!=None:
+                    set_resolution(args.ip, args.u, args.p, args.ch, args.r)
+                if args.f!=None:
+                    set_fps(args.ip, args.u, args.p, args.ch, args.f)
+                if args.b!=None:
+                    set_bitrate(args.ip, args.u, args.p, args.ch, args.b)
+                if args.c!=None:
+                    set_compression(args.ip, args.u, args.p, args.ch, args.c)
+                if args.m!=None:
+                    set_motion(args.ip, args.u, args.p, args.ch, args.m)
+                if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    get_camera_parameters(args.ip, args.u, args.p, args.ch)
+                if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    get_camera_parameters_unique(args.ip, args.u, args.p)
+    else:
+        if args.r!=None:
+            set_resolution(args.ip, args.u, args.p, args.ch, args.r)
+        if args.f!=None:
+            set_fps(args.ip, args.u, args.p, args.ch, args.f)
+        if args.b!=None:
+            set_bitrate(args.ip, args.u, args.p, args.ch, args.b)
+        if args.c!=None:
+            set_compression(args.ip, args.u, args.p, args.ch, args.c)
+        if args.m!=None:
+            set_motion(args.ip, args.u, args.p, args.ch, args.m)
+        if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            get_camera_parameters(args.ip, args.u, args.p, args.ch)
+        if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            get_camera_parameters_unique(args.ip, args.u, args.p)
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##

@@ -639,6 +639,20 @@ if __name__ == "__main__":
         print(ip_list)
         for ip in ip_list:
             getinfoCam(ip, args.u, args.p,args.ch)
+            if args.r!=None:
+                setResolution(ip, args.u, args.p, args.ch, args.r)
+            if args.f!=None:
+                setFps(ip, args.u, args.p, args.ch, args.f)
+            if args.b!=None:
+                setBitrate(ip, args.u, args.p, args.ch, args.b)
+            if args.c!=None:
+                setCompression(ip, args.u, args.p, args.ch, args.c)
+            if args.m!=None:
+                setDetection(ip, args.u, args.p, args.ch,args.m)  
+            if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+                getinfoCam(ip, args.u, args.p,args.ch)
+            if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+                getAllSettings(ip, args.u, args.p)
     else:
         if args.r!=None:
             setResolution(args.ip, args.u, args.p, args.ch, args.r)
