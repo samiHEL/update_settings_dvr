@@ -186,7 +186,7 @@ def set_fps(camera_ip, username, password, channel_id, fps):
 
             
             # Modifier le fps
-            xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps/100}</maxFrameRate>", xml)
+            xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps*100}</maxFrameRate>", xml)
 
             # Effectuer la requête HTTP PUT
             response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
@@ -788,6 +788,7 @@ def get_param(camera_ip, username, password):
         root = ET.fromstring(xml)
         # Utiliser re.search pour extraire la valeur de inputPort pour le dernier VideoInputChannel
         match = re.search(r"<inputPort>(\d+)</inputPort>(?:(?!<inputPort>).)*$", xml, re.DOTALL)
+        
 
         
         if match:
@@ -908,19 +909,19 @@ if __name__ == "__main__":
         print(ip_list)
         for ip in ip_list:
                 if args.r!=None:
-                    set_resolution(args.ip, args.u, args.p, args.ch, args.r)
+                    set_resolution(ip, args.u, args.p, args.ch, args.r)
                 if args.f!=None:
-                    set_fps(args.ip, args.u, args.p, args.ch, args.f)
+                    set_fps(ip, args.u, args.p, args.ch, args.f)
                 if args.b!=None:
-                    set_bitrate(args.ip, args.u, args.p, args.ch, args.b)
+                    set_bitrate(ip, args.u, args.p, args.ch, args.b)
                 if args.c!=None:
-                    set_compression(args.ip, args.u, args.p, args.ch, args.c)
+                    set_compression(ip, args.u, args.p, args.ch, args.c)
                 if args.m!=None:
-                    set_motion(args.ip, args.u, args.p, args.ch, args.m)
+                    set_motion(ip, args.u, args.p, args.ch, args.m)
                 if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
-                    get_camera_parameters(args.ip, args.u, args.p, args.ch)
+                    get_camera_parameters(ip, args.u, args.p, args.ch)
                 if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
-                    get_camera_parameters_unique(args.ip, args.u, args.p)
+                    get_camera_parameters_unique(ip, args.u, args.p)
     else:
         if args.r!=None:
             set_resolution(args.ip, args.u, args.p, args.ch, args.r)
