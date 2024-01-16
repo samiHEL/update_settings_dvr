@@ -186,7 +186,7 @@ def set_fps(camera_ip, username, password, channel_id, fps):
 
             
             # Modifier le fps
-            xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps*100}</maxFrameRate>", xml)
+            xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps/100}</maxFrameRate>", xml)
 
             # Effectuer la requête HTTP PUT
             response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
@@ -787,8 +787,9 @@ def get_param(camera_ip, username, password):
         namespace = {'ns': 'http://www.hikvision.com/ver20/XMLSchema'}
         root = ET.fromstring(xml)
         # Utiliser re.search pour extraire la valeur de inputPort pour le dernier VideoInputChannel
-        match = re.search(r"<inputPort>(\d+)</inputPort>", xml)
+        match = re.search(r"<inputPort>(\d+)</inputPort>(?:(?!<inputPort>).)*$", xml, re.DOTALL)
 
+        
         if match:
             valeur_input_port = match.group(1)
             #print("Valeur de inputPort pour le dernier VideoInputChannel :", valeur_input_port)
