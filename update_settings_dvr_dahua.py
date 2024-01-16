@@ -136,7 +136,7 @@ def numberCam(camera_ip, username, password):
             return [dernier_chiffre+1,port]
         else:
             print("nombre de camera introuvable")
-            return [40,port]
+            return [1,port]
             # print("/// Port 80 indisponnible -> Test en cours avec autre port ...")
             # for port in open_ports:
             #     url_test=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
