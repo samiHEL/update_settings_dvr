@@ -145,11 +145,12 @@ def numberCam(camera_ip, username, password):
                        
                       
 def getinfoCam(camera_ip, username, password, channel_id):
-    number=numberCam(camera_ip, username, password)
-    port=number[1]
     if "{" in camera_ip :
         for ip in ipaddress.IPv4Network(camera_ip, strict=False):
             ip_str = str(ip)
+            print(ip_str)
+            number=numberCam(ip_str, username, password)
+            port=number[1]
             if channel_id=="all_sub":
                     sub = f"http://{ip_str}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[0].ExtraFormat[0]"
                     r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
@@ -181,6 +182,8 @@ def getinfoCam(camera_ip, username, password, channel_id):
                                     bitrate_types = target_line_bitrate.split('=')[1].strip()
                                     print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
     else :
+        number=numberCam(camera_ip, username, password)
+        port=number[1]
         for x in range(int(number[0])):
                 if channel_id=="all_sub":
                     sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
