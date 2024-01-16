@@ -45,10 +45,9 @@ import importlib
 
 #     return open_ports
 
-
 def expand_ip_range(ip_range):
     ip_list = []
-    match = re.match(r'^(\d+\.\d+\.\d+\.{)(\d+)(,\d+)+}$', ip_range)
+    match = re.match(r'^(\d+\.\d+\.\d+\.)\{(\d+)(,\d+)+\}$', ip_range)
     
     if match:
         prefix = match.group(1)
@@ -196,6 +195,7 @@ def getinfoCam(camera_ip, username, password, channel_id):
     #                                 bitrate_types = target_line_bitrate.split('=')[1].strip()
     #                                 print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
     # else :
+        print(camera_ip)
         number=numberCam(camera_ip, username, password)
         port=number[1]
         for x in range(int(number[0])):
