@@ -4,6 +4,7 @@ import base64
 import hashlib
 import re
 import argparse
+import ipaddress
 #url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/snapshot.cgi?channel=1"
 #ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
 ##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
@@ -146,37 +147,71 @@ def numberCam(camera_ip, username, password):
 def getinfoCam(camera_ip, username, password, channel_id):
     number=numberCam(camera_ip, username, password)
     port=number[1]
-    for x in range(int(number[0])):
+    if "{" in camera_ip :
+        for ip in ipaddress.IPv4Network(camera_ip, strict=False):
+            ip_str = str(ip)
             if channel_id=="all_sub":
-                sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
-                r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
-                print(r.status_code)
-                if r.status_code == 200:
-                                print("-----")
-                                target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
-                                compression_types = target_line_compression.split('=')[1].strip()
-                                target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
-                                resolution_types = target_line_resolution.split('=')[1].strip()
-                                target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
-                                fps_types = target_line_fps.split('=')[1].strip()
-                                target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
-                                bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                    sub = f"http://{ip_str}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[0].ExtraFormat[0]"
+                    r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
+                    print(r.status_code)
+                    if r.status_code == 200:
+                                    print("-----")
+                                    target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.Compression' in line)
+                                    compression_types = target_line_compression.split('=')[1].strip()
+                                    target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.resolution' in line)
+                                    resolution_types = target_line_resolution.split('=')[1].strip()
+                                    target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.FPS' in line)
+                                    fps_types = target_line_fps.split('=')[1].strip()
+                                    target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.BitRate' in line)
+                                    bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                    print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
             if channel_id=="all_main":
-                sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].MainFormat[0]"
-                r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
-                print(r.status_code)
-                if r.status_code == 200:
-                                print("-----")
-                                target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.Compression' in line)
-                                compression_types = target_line_compression.split('=')[1].strip()
-                                target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.resolution' in line)
-                                resolution_types = target_line_resolution.split('=')[1].strip()
-                                target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.FPS' in line)
-                                fps_types = target_line_fps.split('=')[1].strip()
-                                target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.BitRate' in line)
-                                bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                    sub = f"http://{ip_str}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[0].MainFormat[0]"
+                    r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
+                    print(r.status_code)
+                    if r.status_code == 200:
+                                    print("-----")
+                                    target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.Compression' in line)
+                                    compression_types = target_line_compression.split('=')[1].strip()
+                                    target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.resolution' in line)
+                                    resolution_types = target_line_resolution.split('=')[1].strip()
+                                    target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.FPS' in line)
+                                    fps_types = target_line_fps.split('=')[1].strip()
+                                    target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.BitRate' in line)
+                                    bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                    print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+    else :
+        for x in range(int(number[0])):
+                if channel_id=="all_sub":
+                    sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
+                    r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
+                    print(r.status_code)
+                    if r.status_code == 200:
+                                    print("-----")
+                                    target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
+                                    compression_types = target_line_compression.split('=')[1].strip()
+                                    target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
+                                    resolution_types = target_line_resolution.split('=')[1].strip()
+                                    target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
+                                    fps_types = target_line_fps.split('=')[1].strip()
+                                    target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
+                                    bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                    print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                if channel_id=="all_main":
+                    sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].MainFormat[0]"
+                    r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
+                    print(r.status_code)
+                    if r.status_code == 200:
+                                    print("-----")
+                                    target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.Compression' in line)
+                                    compression_types = target_line_compression.split('=')[1].strip()
+                                    target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.resolution' in line)
+                                    resolution_types = target_line_resolution.split('=')[1].strip()
+                                    target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.FPS' in line)
+                                    fps_types = target_line_fps.split('=')[1].strip()
+                                    target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.BitRate' in line)
+                                    bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                    print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
 def getAllSettings(camera_ip, username, password):
     number=numberCam(camera_ip, username, password)
     port=number[1]
@@ -433,6 +468,53 @@ def setCompression(camera_ip, username, password, channel_id, compression):
                 print("Pas bon format !")
             else : 
                 print(f"Erreur : {r.status_code} - {r.text}")
+def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole):
+    number=numberCam(camera_ip, username, password)
+    port=number[1]
+    if "all" in channel_id:
+        for x in range(int(number[0])):
+            print(x+1)
+
+            if channel_id.lower()=="all_sub":   
+                bcontrole_cam=f"Encode[{x}].ExtraFormat[0].Video.BitRateControl"
+                bcontrole=f"Encode["+str(x)+"].ExtraFormat[0].Video.BitRateControl"
+
+                url_bcontrole = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bcontrole}={Bcontrole}"
+                r = requests.put(url_bcontrole, stream=True, auth=HTTPDigestAuth(username, password)) 
+                print(r.status_code)
+                if r.status_code == 200:
+                                print("FPS pour camera "+str(x+1)+" mise à "+str(Bcontrole))
+                elif r.status_code == 400:
+                    print("Pas bon format !")
+                else : 
+                    print(f"Erreur : {r.status_code} - {r.text}")
+                    
+            
+            elif channel_id.lower()=="all_main":   
+                bcontrole=f"Encode[{x}].MainFormat[0].Video.FPS"
+                url_bcontrole = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bcontrole}={Bcontrole}"
+                print(url_bcontrole)
+                r = requests.put(url_bcontrole, stream=True, auth=HTTPDigestAuth(username, password)) 
+                print(r.status_code)
+                if r.status_code == 200:
+                                print("FPS pour camera "+str(x+1)+" mise à "+str(Bcontrole))
+                elif r.status_code == 400:
+                    print("Pas bon format !")
+                else : 
+                    print(f"Erreur : {r.status_code} - {r.text}")
+    else:
+            channel_id=int(channel_id)-1
+            bcontrole=f"Encode[{channel_id}].ExtraFormat[0].Video.FPS"
+            url_bcontrole = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bcontrole}={Bcontrole}"
+            print(url_bcontrole)
+            r = requests.put(url_bcontrole, stream=True, auth=HTTPDigestAuth(username, password)) 
+            print(r.status_code)
+            if r.status_code == 200:
+                            print("FPS pour camera "+str(channel_id)+" mise à "+str(Bcontrole)) 
+            elif r.status_code == 400:
+                    print("Pas bon format !")
+            else : 
+                    print(f"Erreur : {r.status_code} - {r.text}")
 def setEncryption(camera_ip, username, password):
     url_encrypt = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.eth2.Encryption=On"
     #url_encrypt = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=getConfig&name=WLan"
@@ -549,3 +631,4 @@ if __name__ == "__main__":
         getinfoCam(args.ip, args.u, args.p,args.ch)
     if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
         getAllSettings(args.ip, args.u, args.p)
+          
