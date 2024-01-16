@@ -12,6 +12,7 @@ ns5 = {'xmlns': 'http://www.isapi.com/ver20/XMLSchema'}
 
 
 
+
 import subprocess
 import time
 import importlib
@@ -782,12 +783,14 @@ def get_param(camera_ip, username, password):
     # Vérifier si la requête a réussi
     if response_get.status_code == 200:
         xml = response_get.text
+        
         namespace = {'ns': 'http://www.hikvision.com/ver20/XMLSchema'}
         root = ET.fromstring(xml)
         # Utiliser re.search pour extraire la valeur de inputPort pour le dernier VideoInputChannel
-        match = re.search(r"<inputPort>(\d+)</inputPort>.*<inputPort>(\d+)</inputPort>", xml, re.DOTALL)
+        match = re.search(r"<inputPort>(\d+)</inputPort>", xml)
+
         if match:
-            valeur_input_port = match.group(2)
+            valeur_input_port = match.group(1)
             #print("Valeur de inputPort pour le dernier VideoInputChannel :", valeur_input_port)
             return [valeur_input_port,port]
         else:
