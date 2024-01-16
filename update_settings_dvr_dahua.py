@@ -47,7 +47,7 @@ import importlib
 
 def expand_ip_range(ip_range):
     ip_list = []
-    match = re.match(r'^(\d+\.\d+\.\d+\.)\{(\d+)(,\d+)+\}$', ip_range)
+    match = re.match(r'^(\d+\.\d+\.\d+\.)\{([\d,]+)\}$', ip_range)
     
     if match:
         prefix = match.group(1)
@@ -636,6 +636,7 @@ if __name__ == "__main__":
     #     getAllSettings(args.ip, args.username, args.password)
     if "{" in args.ip :
         ip_list = expand_ip_range(args.ip)
+        print(ip_list)
         for ip in ip_list:
             getinfoCam(ip, args.u, args.p,args.ch)
     if args.r!=None:
