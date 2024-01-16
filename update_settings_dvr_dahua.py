@@ -639,18 +639,19 @@ if __name__ == "__main__":
         print(ip_list)
         for ip in ip_list:
             getinfoCam(ip, args.u, args.p,args.ch)
-    if args.r!=None:
-        setResolution(args.ip, args.u, args.p, args.ch, args.r)
-    if args.f!=None:
-        setFps(args.ip, args.u, args.p, args.ch, args.f)
-    if args.b!=None:
-        setBitrate(args.ip, args.u, args.p, args.ch, args.b)
-    if args.c!=None:
-        setCompression(args.ip, args.u, args.p, args.ch, args.c)
-    if args.m!=None:
-        setDetection(args.ip, args.u, args.p, args.ch,args.m)  
-    # if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
-    #     getinfoCam(args.ip, args.u, args.p,args.ch)
-    if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
-        getAllSettings(args.ip, args.u, args.p)
+    else:
+        if args.r!=None:
+            setResolution(args.ip, args.u, args.p, args.ch, args.r)
+        if args.f!=None:
+            setFps(args.ip, args.u, args.p, args.ch, args.f)
+        if args.b!=None:
+            setBitrate(args.ip, args.u, args.p, args.ch, args.b)
+        if args.c!=None:
+            setCompression(args.ip, args.u, args.p, args.ch, args.c)
+        if args.m!=None:
+            setDetection(args.ip, args.u, args.p, args.ch,args.m)  
+        if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+            getinfoCam(args.ip, args.u, args.p,args.ch)
+        if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+            getAllSettings(args.ip, args.u, args.p)
           
