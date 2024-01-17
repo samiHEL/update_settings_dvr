@@ -9,6 +9,7 @@ ns2 = {'xmlns': 'http://www.hikvision.com/ver20/XMLSchema'}
 ns3 = {'xmlns': 'http://www.std-cgi.com/ver20/XMLSchema'}
 ns4 = {'xmlns': 'http://www.std-cgi.org/ver20/XMLSchema'}
 ns5 = {'xmlns': 'http://www.isapi.com/ver20/XMLSchema'}
+ns6 = {'xmlns': 'http://www.isapi.org/ver20/XMLSchema'}
 
 
 
@@ -78,13 +79,16 @@ def is_http_port(camera_ip, username, password, port):
 
 
 ## MODIF RESOLUTION CAM FLUX PRIMAIRE OU SECONDAIRE
-def set_resolution(camera_ip, username, password, channel_id, resolution):
+def set_resolution(camera_ip, username, password, channel_id, resolution,cam):
     resolution_width = resolution.split("x")[0]
     resolution_height = resolution.split("x")[1]
     number=get_param(camera_ip, username, password)
     port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
     if "all"in channel_id:
-        for x in range(int(number[0])):
+        for x in range(nbCam):
             print(x+1)
             if channel_id=="all_main":
                 channel=x+1
@@ -477,6 +481,27 @@ def get_camera_parameters(camera_ip, username, password, channel_id):
                         except : 
                             debit_bin_max = vbr_Upper_Cap    
                         encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns4).text
+                    elif  namespace_uri in ns6['xmlns'] :
+                        id_channel = root.find('.//xmlns:channelName', namespaces=ns6).text
+                        width_resolution = root.find('.//xmlns:videoResolutionWidth', namespaces=ns6).text
+                        height_resolution = root.find('.//xmlns:videoResolutionHeight', namespaces=ns6).text
+                        
+                        image_par_sec = root.find('.//xmlns:maxFrameRate', namespaces=ns6).text
+                        
+                        try:
+                            constant_bit_rate = root.find('.//xmlns:constantBitRate', namespaces=ns6).text
+                        except:
+                            constant_bit_rate = None
+                        type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
+                        try:
+                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns).text
+                        except:
+                            vbr_Upper_Cap =  None
+                        try :
+                            debit_bin_max = constant_bit_rate 
+                        except : 
+                            debit_bin_max = vbr_Upper_Cap    
+                        encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns4).text
 
                     print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
                     print("-----------")
@@ -799,7 +824,7 @@ def get_param(camera_ip, username, password):
             print("Balise inputPort non trouvée dans le dernier VideoInputChannel.")
     else:
         print(f"Erreur : {response_get.status_code} - {response_get.text}")
-        return [1,port]
+        return [30,port]
 
     
 
@@ -909,7 +934,7 @@ if __name__ == "__main__":
         print(ip_list)
         for ip in ip_list:
                 if args.r!=None:
-                    set_resolution(ip, args.u, args.p, args.ch, args.r)
+                    set_resolution(ip, args.u, args.p, args.ch, args.r,"yes")
                 if args.f!=None:
                     set_fps(ip, args.u, args.p, args.ch, args.f)
                 if args.b!=None:
