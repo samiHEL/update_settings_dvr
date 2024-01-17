@@ -156,7 +156,7 @@ def numberCam(camera_ip, username, password):
             #            print("port "+str(port)+" pas compatible en Http")
                        
                       
-def getinfoCam(camera_ip, username, password, channel_id):
+def getinfoCam(camera_ip, username, password, channel_id,cam):
     # if "{" in camera_ip :
     #     ip_list = expand_ip_range(camera_ip)
     #     for ip in ip_list:
@@ -198,7 +198,10 @@ def getinfoCam(camera_ip, username, password, channel_id):
         print(camera_ip)
         number=numberCam(camera_ip, username, password)
         port=number[1]
-        for x in range(int(number[0])):
+        nbCam=int(number[0])
+        if cam == "yes":
+            nbCam = 1
+        for x in range(nbCam):
                 if channel_id=="all_sub":
                     sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].ExtraFormat[0]"
                     r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
@@ -290,11 +293,14 @@ def getAllSettings(camera_ip, username, password):
                         print("Flux secondaire")
                         print_results(compression_types,resolution_types,fps_types,bitrate_types) 
                         print("-----------")
-def setResolution(camera_ip, username, password, channel_id,resolution):
+def setResolution(camera_ip, username, password, channel_id,resolution,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
     if "all" in channel_id:
-        for x in range(int(number[0])):
+        for x in range(nbCam):
             print(x+1)
 
             if channel_id.lower()=="all_sub":   
@@ -339,11 +345,14 @@ def setResolution(camera_ip, username, password, channel_id,resolution):
             else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
     
-def setFps(camera_ip, username, password, channel_id, fps):
+def setFps(camera_ip, username, password, channel_id, fps,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
     if "all" in channel_id:
-        for x in range(int(number[0])):
+        for x in range(nbCam):
             print(x+1)
 
             if channel_id.lower()=="all_sub":   
@@ -386,11 +395,14 @@ def setFps(camera_ip, username, password, channel_id, fps):
                     print("Pas bon format !")
             else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
-def setBitrate(camera_ip, username, password, channel_id, bitrate):
+def setBitrate(camera_ip, username, password, channel_id, bitrate,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
     if "all" in channel_id:
-        for x in range(int(number[0])):
+        for x in range(nbCam):
             print(x+1)
         
             if channel_id.lower()=="all_sub":   
@@ -430,11 +442,14 @@ def setBitrate(camera_ip, username, password, channel_id, bitrate):
                     print("Pas bon format !")
             else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
-def setCompression(camera_ip, username, password, channel_id, compression):
+def setCompression(camera_ip, username, password, channel_id, compression,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
     if "all" in channel_id:
-        for x in range(int(number[0])):
+        for x in range(nbCam):
             print(x+1)
         
             if channel_id.lower()=="all_sub":   
@@ -485,11 +500,14 @@ def setCompression(camera_ip, username, password, channel_id, compression):
                 print("Pas bon format !")
             else : 
                 print(f"Erreur : {r.status_code} - {r.text}")
-def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole):
+def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
     if "all" in channel_id:
-        for x in range(int(number[0])):
+        for x in range(nbCam):
             print(x+1)
 
             if channel_id.lower()=="all_sub":   
@@ -540,7 +558,7 @@ def setEncryption(camera_ip, username, password):
     print(r.status_code)
     if r.status_code == 200:
                     print(r.text) 
-def setDetection(camera_ip, username, password,channel_id,motionDetect):
+def setDetection(camera_ip, username, password,channel_id,motionDetect,cam):
     channel_id=int(channel_id)-1
     channel_str=channel_id+1
     url_detection=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{channel_id}].Enable={motionDetect.lower()}"
@@ -550,8 +568,11 @@ def setDetection(camera_ip, username, password,channel_id,motionDetect):
     if r.status_code == 200:
         number=numberCam(camera_ip, username, password)
         port=number[1]
+        nbCam=int(number[0])
+        if cam == "yes":
+            nbCam = 1
         if "all" in channel_id:
-            for x in range(int(number[0])):
+            for x in range(nbCam):
                 print(x+1)
 
                 if channel_id.lower()=="all_sub" or channel_id.lower()=="all_main":   
@@ -638,34 +659,33 @@ if __name__ == "__main__":
         ip_list = expand_ip_range(args.ip)
         print(ip_list)
         for ip in ip_list:
-            getinfoCam(ip, args.u, args.p,args.ch)
             if args.r!=None:
-                setResolution(ip, args.u, args.p, args.ch, args.r)
+                setResolution(ip, args.u, args.p, args.ch, args.r,"yes")
             if args.f!=None:
-                setFps(ip, args.u, args.p, args.ch, args.f)
+                setFps(ip, args.u, args.p, args.ch, args.f,"yes")
             if args.b!=None:
-                setBitrate(ip, args.u, args.p, args.ch, args.b)
+                setBitrate(ip, args.u, args.p, args.ch, args.b,"yes")
             if args.c!=None:
-                setCompression(ip, args.u, args.p, args.ch, args.c)
+                setCompression(ip, args.u, args.p, args.ch, args.c,"yes")
             if args.m!=None:
-                setDetection(ip, args.u, args.p, args.ch,args.m)  
+                setDetection(ip, args.u, args.p, args.ch,args.m,"yes")  
             if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
-                getinfoCam(ip, args.u, args.p,args.ch)
+                getinfoCam(ip, args.u, args.p,args.ch,"yes")
             if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
                 getAllSettings(ip, args.u, args.p)
     else:
         if args.r!=None:
-            setResolution(args.ip, args.u, args.p, args.ch, args.r)
+            setResolution(args.ip, args.u, args.p, args.ch, args.r,"no")
         if args.f!=None:
-            setFps(args.ip, args.u, args.p, args.ch, args.f)
+            setFps(args.ip, args.u, args.p, args.ch, args.f,"no")
         if args.b!=None:
-            setBitrate(args.ip, args.u, args.p, args.ch, args.b)
+            setBitrate(args.ip, args.u, args.p, args.ch, args.b,"no")
         if args.c!=None:
-            setCompression(args.ip, args.u, args.p, args.ch, args.c)
+            setCompression(args.ip, args.u, args.p, args.ch, args.c,"no")
         if args.m!=None:
-            setDetection(args.ip, args.u, args.p, args.ch,args.m)  
+            setDetection(args.ip, args.u, args.p, args.ch,args.m,"no")  
         if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
-            getinfoCam(args.ip, args.u, args.p,args.ch)
+            getinfoCam(args.ip, args.u, args.p,args.ch,"no")
         if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getAllSettings(args.ip, args.u, args.p)
           
