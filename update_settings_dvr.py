@@ -949,7 +949,7 @@ if __name__ == "__main__":
                     get_camera_parameters_unique(ip, args.u, args.p)
     else:
         if args.r!=None:
-            set_resolution(args.ip, args.u, args.p, args.ch, args.r)
+            set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
         if args.f!=None:
             set_fps(args.ip, args.u, args.p, args.ch, args.f)
         if args.b!=None:
