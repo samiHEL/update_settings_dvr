@@ -639,6 +639,8 @@ if __name__ == "__main__":
     parser.add_argument("--b", type=int, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
+    parser.add_argument("--bc", type=str, required=False)
+
 
     args = parser.parse_args()
     # if args.resolution!=None:
@@ -669,6 +671,8 @@ if __name__ == "__main__":
                 setCompression(ip, args.u, args.p, args.ch, args.c,"yes")
             if args.m!=None:
                 setDetection(ip, args.u, args.p, args.ch,args.m,"yes")  
+            if args.m!=None:
+                setBitrateControl(ip, args.u, args.p, args.ch,args.bg,"yes")  
             if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
                 getinfoCam(ip, args.u, args.p,args.ch,"yes")
             if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
@@ -684,6 +688,8 @@ if __name__ == "__main__":
             setCompression(args.ip, args.u, args.p, args.ch, args.c,"no")
         if args.m!=None:
             setDetection(args.ip, args.u, args.p, args.ch,args.m,"no")  
+        if args.m!=None:
+            setBitrateControl(args.ip, args.u, args.p, args.ch,args.bc,"no") 
         if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getinfoCam(args.ip, args.u, args.p,args.ch,"no")
         if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
