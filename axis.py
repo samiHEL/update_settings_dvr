@@ -42,7 +42,6 @@ def test_imagesize():
     username = 'root'
     password = 'pass'
     api_endpoint = "/param.cgi?action=list&group=Properties.Image.Resolution"
-    http://myserver/axis-cgi/imagesize.cgi?camera=1
 
     camera_id = "1"
     url = f"{base_url}{api_endpoint}"
