@@ -170,7 +170,7 @@ if __name__ == "__main__":
     parser.add_argument("--u", type=str, required=True)
     parser.add_argument("--p", type=str, required=True)
     parser.add_argument("--r", type=str, required=False)
-    parser.add_argument("--f", type=int, required=False)
+    parser.add_argument("--f", type=str, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
     
