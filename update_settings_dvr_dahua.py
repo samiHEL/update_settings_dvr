@@ -27,24 +27,7 @@ import subprocess
 import time
 import importlib
 
-
-#nmap = importlib.reload(nmap)
-
-
-# def scan_ports(target_ip):
-#     nm = nmap.PortScanner()
-#     nm.scan(target_ip, arguments='-p 1-65535 --open')
-
-#     open_ports = []
-
-#     for host in nm.all_hosts():
-#         for proto in nm[host].all_protocols():
-#             lport = nm[host][proto].keys()
-#             for port in lport:
-#                 open_ports.append(port)
-
-#     return open_ports
-
+#CREER LISTE ADRESSE IP QUAND CAM IP
 def expand_ip_range(ip_range):
     ip_list = []
     match = re.match(r'^(\d+\.\d+\.\d+\.)\{([\d,]+)\}$', ip_range)
@@ -58,6 +41,7 @@ def expand_ip_range(ip_range):
     
     return ip_list
 
+#TROUVER PORT OUVERT SUR DVR OU CAM IP
 def scan_ports(target_ip):
     open_ports = []
 
@@ -77,6 +61,8 @@ def scan_ports(target_ip):
     else:
         print(f"Erreur lors de l'exécution de la commande Nmap: {error.decode('utf-8')}")
         return None
+
+#LE PORT EST IL UN PORT HTTP ?
 def is_http_port(camera_ip, username, password, port):
     url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].ExtraFormat[0]"
     url2 = f'http://www.google.com:{port}' 
@@ -94,6 +80,8 @@ def is_http_port(camera_ip, username, password, port):
         except:   
             print("erreur avec port "+str(port))
             return False  # La connexion a échoué
+
+
 def print_results(compression_types,resolution_types,fps_types,bitrate_types):
     print('Compression_types : ', compression_types)
     print('Resolution_types: ', resolution_types)
@@ -105,6 +93,10 @@ def print_results_cam(compression_types,resolution_types,fps_types,bitrate_types
     print('Resolution_types: ', resolution_types)
     print('Fps_types : ', fps_types)
     print('Bitrate_types: ', bitrate_types.replace(",","-"))
+
+
+
+#TROUVER NOMBRE DE CAM SUR UN DVR / SI CAM IP NE PAS PRENDRE EN COMPTE
 def numberCam(camera_ip, username, password):
         open_ports=scan_ports(camera_ip)
         print(open_ports)
@@ -157,44 +149,6 @@ def numberCam(camera_ip, username, password):
                        
                       
 def getinfoCam(camera_ip, username, password, channel_id,cam):
-    # if "{" in camera_ip :
-    #     ip_list = expand_ip_range(camera_ip)
-    #     for ip in ip_list:
-    #         ip_str = str(ip)
-    #         print(ip_str)
-    #         number=numberCam(ip_str, username, password)
-    #         port=number[1]
-    #         if channel_id=="all_sub":
-    #                 sub = f"http://{ip_str}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[0].ExtraFormat[0]"
-    #                 r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
-    #                 print(r.status_code)
-    #                 if r.status_code == 200:
-    #                                 print("-----")
-    #                                 target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.Compression' in line)
-    #                                 compression_types = target_line_compression.split('=')[1].strip()
-    #                                 target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.resolution' in line)
-    #                                 resolution_types = target_line_resolution.split('=')[1].strip()
-    #                                 target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.FPS' in line)
-    #                                 fps_types = target_line_fps.split('=')[1].strip()
-    #                                 target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode[0].ExtraFormat[0].Video.BitRate' in line)
-    #                                 bitrate_types = target_line_bitrate.split('=')[1].strip()
-    #                                 print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
-    #         if channel_id=="all_main":
-    #                 sub = f"http://{ip_str}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[0].MainFormat[0]"
-    #                 r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
-    #                 print(r.status_code)
-    #                 if r.status_code == 200:
-    #                                 print("-----")
-    #                                 target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.Compression' in line)
-    #                                 compression_types = target_line_compression.split('=')[1].strip()
-    #                                 target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.resolution' in line)
-    #                                 resolution_types = target_line_resolution.split('=')[1].strip()
-    #                                 target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.FPS' in line)
-    #                                 fps_types = target_line_fps.split('=')[1].strip()
-    #                                 target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode[0].MainFormat[0].Video.BitRate' in line)
-    #                                 bitrate_types = target_line_bitrate.split('=')[1].strip()
-    #                                 print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
-    # else :
         print(camera_ip)
         number=numberCam(camera_ip, username, password)
         port=number[1]
@@ -643,20 +597,6 @@ if __name__ == "__main__":
 
 
     args = parser.parse_args()
-    # if args.resolution!=None:
-    #     setResolution(args.ip, args.username, args.password, args.channel, args.resolution)
-    # if args.fps!=None:
-    #     setFps(args.ip, args.username, args.password, args.channel, args.fps)
-    # if args.bitrate!=None:
-    #     setBitrate(args.ip, args.username, args.password, args.channel, args.bitrate)
-    # if args.compression!=None:
-    #     setCompression(args.ip, args.username, args.password, args.channel, args.compression)
-    # if args.motionDetect!=None:
-    #     setDetection(args.ip, args.username, args.password, args.channel,args.motionDetect)  
-    # if args.channel!=None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
-    #     getinfoCam(args.ip, args.username, args.password,args.channel)
-    # if args.channel==None and args.compression==None and args.bitrate==None and args.fps==None and args.resolution==None and args.motionDetect==None:
-    #     getAllSettings(args.ip, args.username, args.password)
     if "{" in args.ip :
         ip_list = expand_ip_range(args.ip)
         print(ip_list)
@@ -671,8 +611,8 @@ if __name__ == "__main__":
                 setCompression(ip, args.u, args.p, args.ch, args.c,"yes")
             if args.m!=None:
                 setDetection(ip, args.u, args.p, args.ch,args.m,"yes")  
-            if args.m!=None:
-                setBitrateControl(ip, args.u, args.p, args.ch,args.bg,"yes")  
+            if args.bc!=None:
+                setBitrateControl(ip, args.u, args.p, args.ch,args.bc,"yes")  
             if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
                 getinfoCam(ip, args.u, args.p,args.ch,"yes")
             if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
@@ -688,7 +628,7 @@ if __name__ == "__main__":
             setCompression(args.ip, args.u, args.p, args.ch, args.c,"no")
         if args.m!=None:
             setDetection(args.ip, args.u, args.p, args.ch,args.m,"no")  
-        if args.m!=None:
+        if args.bc!=None:
             setBitrateControl(args.ip, args.u, args.p, args.ch,args.bc,"no") 
         if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getinfoCam(args.ip, args.u, args.p,args.ch,"no")
