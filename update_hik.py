@@ -648,7 +648,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id,cam):
             except requests.RequestException as e:
                 print(f"Erreur de requête : {e}")
 #Info reseaux y compris acces à la plateforme
-def network_info(camera_ip, username, password, param):
+def encryption(camera_ip, username, password, param):
     number=get_param(camera_ip, username, password)
     port=number[1]
     #url = f'http://{camera_ip}:{port}/ISAPI/System/Network/capabilities'EZVIZ
@@ -925,8 +925,6 @@ def get_param(camera_ip, username, password):
         # Utiliser re.search pour extraire la valeur de inputPort pour le dernier VideoInputChannel
         match = re.search(r"<inputPort>(\d+)</inputPort>(?:(?!<inputPort>).)*$", xml, re.DOTALL)
         
-
-        
         if match:
             valeur_input_port = match.group(1)
             #print("Valeur de inputPort pour le dernier VideoInputChannel :", valeur_input_port)
@@ -936,8 +934,6 @@ def get_param(camera_ip, username, password):
     else:
         print(f"Erreur : {response_get.status_code} - {response_get.text}")
         return [30,port]
-
-    
 
 def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
     number=get_param(camera_ip, username, password)
@@ -1074,7 +1070,7 @@ if __name__ == "__main__":
         if args.m!=None:
             set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
         if args.param!=None:
-            network_info(args.ip, args.u, args.p, args.param)
+            encryption(args.ip, args.u, args.p, args.param)
         if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
         if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
