@@ -75,6 +75,8 @@ def is_http_port(camera_ip, username, password, port):
         except:   
             print("erreur avec port "+str(port))
             return False  # La connexion a échoué
+        
+        
 
 
 
@@ -645,6 +647,47 @@ def get_camera_parameters(camera_ip, username, password, channel_id,cam):
 
             except requests.RequestException as e:
                 print(f"Erreur de requête : {e}")
+#Info reseaux y compris acces à la plateforme
+def network_info(camera_ip, username, password, param):
+    number=get_param(camera_ip, username, password)
+    port=number[1]
+    #url = f'http://{camera_ip}:{port}/ISAPI/System/Network/capabilities'EZVIZ
+    url = f'http://{camera_ip}:{port}/ISAPI/System/Network/EZVIZ'
+    #url = f'http://{camera_ip}:{port}/ISAPI/System/capabilities'
+    #url = f'http://{camera_ip}:{port}/ISAPI/Streaming/encryption/capabilities?format=json'
+    #url = f'http://{camera_ip}:{port}/ISAPI/Streaming/encryption/secretKey?format=json'
+    
+    #reponse -> <isSupportStreamingEncrypt>true</isSupportStreamingEncrypt>
+    response = requests.get(url, auth=HTTPDigestAuth(username, password))
+
+    # Vérifier si la requête a réussi
+    if response.status_code == 200:
+        xml = response.text
+        print("--------------- PARAMETRE AVANT CHANGEMENT ---------------" )
+        print(xml)
+        print("------------------------------")
+    else:
+        print(f"Erreur : {response.status_code} - {response.text}")
+        return
+    if param.lower() == "see":
+        return
+    # Modifier la résolution
+    if param.lower() =="on":
+        xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>true</enabled>", xml)
+    else:
+        xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>false</enabled>", xml)
+
+    # Effectuer la requête HTTP PUT
+    response = requests.put(url, auth=HTTPDigestAuth(username, password), data=xml)
+
+    # Vérifier si la requête a réussi
+    if response.status_code == 200:
+        print(response.status_code)
+        print("--------------- PARAMETRE APRES CHANGEMENT ---------------")
+        print(xml)
+        print("------------------------------")
+    else:
+        print(f"Erreur : {response.status_code} - {response.text}")
 
 ## Recuperer liste parametres flux vidéo secondaire ou primaire ##       
 def get_camera_parameters_unique(camera_ip, username, password):
@@ -998,6 +1041,7 @@ if __name__ == "__main__":
     parser.add_argument("--b", type=int, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
+    parser.add_argument("--param", type=str, required=False)
 
     args = parser.parse_args()
     if "{" in args.ip :
@@ -1029,10 +1073,13 @@ if __name__ == "__main__":
             set_compression(args.ip, args.u, args.p, args.ch, args.c,"no")
         if args.m!=None:
             set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
+        if args.param!=None:
+            network_info(args.ip, args.u, args.p, args.param)
         if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
         if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters_unique(args.ip, args.u, args.p)
+            
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
