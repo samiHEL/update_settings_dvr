@@ -111,7 +111,6 @@ def set_resolution(camera_ip, username, password, channel_id, resolution,cam):
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-                return
 
             # Modifier la résolution
 
@@ -189,7 +188,6 @@ def set_fps(camera_ip, username, password, channel_id, fps,cam):
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-                return
 
             # Modifier la résolution
 
@@ -263,7 +261,6 @@ def set_bitrate(camera_ip, username, password, channel_id, BitRate,cam):
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-                return
 
             # Modifier la résolution
 
@@ -295,7 +292,6 @@ def set_bitrate(camera_ip, username, password, channel_id, BitRate,cam):
             xml = response_get.text
         else:
             print(f"Erreur : {response_get.status_code} - {response_get.text}")
-            return
 
         # Modifier le bitrate
         try:
@@ -338,7 +334,6 @@ def set_compression(camera_ip, username, password, channel_id, compression,cam):
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-                return
 
             # Modifier la résolution
 
@@ -364,7 +359,6 @@ def set_compression(camera_ip, username, password, channel_id, compression,cam):
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-                return
 
             # Modifier la résolution
 
@@ -962,7 +956,6 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
                 print("------------------------------")
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-                return
 
             # Modifier la résolution
 
@@ -990,7 +983,6 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
             xml = response_get.text
         else:
             print(f"Erreur : {response_get.status_code} - {response_get.text}")
-            return
 
         # Modifier la résolution
 
