@@ -502,14 +502,14 @@ def get_camera_parameters(camera_ip, username, password, channel_id,cam):
                             constant_bit_rate = None
                         type_bande_passante = 'Constant' if constant_bit_rate is not None else 'Variable'
                         try:
-                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns).text
+                            vbr_Upper_Cap =  root.find('.//xmlns:vbrUpperCap', namespaces=ns6).text
                         except:
                             vbr_Upper_Cap =  None
                         try :
                             debit_bin_max = constant_bit_rate 
                         except : 
                             debit_bin_max = vbr_Upper_Cap    
-                        encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns4).text
+                        encodage_video = root.find('.//xmlns:videoCodecType', namespaces=ns6).text
 
                     print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video)
                     print("-----------")
