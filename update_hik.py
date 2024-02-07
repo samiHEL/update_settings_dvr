@@ -699,7 +699,7 @@ def get_camera_parameters_unique(camera_ip, username, password):
             if response.status_code == 200:
 
                 xml = response.text
-                print(xml)
+                #print(xml)
                 root = ET.fromstring(xml)
                 namespace_uri = root.tag.split('}', 1)[0][1:]
 
