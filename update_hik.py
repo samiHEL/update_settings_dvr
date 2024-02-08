@@ -79,15 +79,17 @@ def is_http_port(camera_ip, username, password, port):
         
 
 
-def getUsers(camera_ip,port,username, password):
+def getUsers(camera_ip,username, password):
 
         # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-    url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users'
+    
     #print(url_image_settings)
     number=get_param(camera_ip, username, password)
     port=number[1]
     # Effectuer une requête HTTP GET
+    url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users/'
     response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+
 
     # Vérifier si la requête a réussi
     if response_get.status_code == 200:
