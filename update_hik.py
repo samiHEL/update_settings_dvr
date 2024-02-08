@@ -76,17 +76,6 @@ def is_http_port(camera_ip, username, password, port):
             print("erreur avec port "+str(port))
             return False  # La connexion a échoué
         
-        
-
-
-def getUsers(camera_ip,username, password,user):
-
-        # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-    print(user)
-    #print(url_image_settings)
-    number=get_param(camera_ip, username, password)
-    port=number[1]
-    # Effectuer une requête HTTP GET
    
 
 ## MODIF RESOLUTION CAM FLUX PRIMAIRE OU SECONDAIRE
@@ -703,7 +692,6 @@ def get_camera_parameters_unique(camera_ip, username, password):
     # Vérifier si la requête a réussi
     if response_get.status_code == 200:
         xml = response_get.text
-        print(xml)
     else:
         print(f"Erreur : {response_get.status_code} - {response_get.text}")
     tab=[[url_image_settings_main,"primaire"],[url_image_settings_sub,"secondaire"]]
@@ -1047,7 +1035,6 @@ if __name__ == "__main__":
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
     parser.add_argument("--encrypt", type=str, required=False)
-    parser.add_argument("--user", type=str, required=False)
 
     args = parser.parse_args()
     if "{" in args.ip :
@@ -1085,8 +1072,6 @@ if __name__ == "__main__":
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
         if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters_unique(args.ip, args.u, args.p)
-        if args.user!=None:
-            getUsers(args.ip, args.u, args.p,args.user)
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
