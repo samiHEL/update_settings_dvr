@@ -1044,6 +1044,7 @@ if __name__ == "__main__":
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
     parser.add_argument("--encrypt", type=str, required=False)
+    parser.add_argument("--user", type=str, required=False)
 
     args = parser.parse_args()
     if "{" in args.ip :
