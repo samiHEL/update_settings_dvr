@@ -87,16 +87,7 @@ def getUsers(camera_ip,username, password,user):
     number=get_param(camera_ip, username, password)
     port=number[1]
     # Effectuer une requête HTTP GET
-    url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users/'
-    response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-
-    # Vérifier si la requête a réussi
-    if response_get.status_code == 200:
-        xml = response_get.text
-        print(xml)
-    else:
-        print(f"Erreur : {response_get.status_code} - {response_get.text}")
+   
 
 ## MODIF RESOLUTION CAM FLUX PRIMAIRE OU SECONDAIRE
 def set_resolution(camera_ip, username, password, channel_id, resolution,cam):
@@ -705,6 +696,16 @@ def get_camera_parameters_unique(camera_ip, username, password):
     port=number[1]
     url_image_settings_main = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101/capabilities'
     url_image_settings_sub = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/102/capabilities'
+    url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users/'
+    response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+
+
+    # Vérifier si la requête a réussi
+    if response_get.status_code == 200:
+        xml = response_get.text
+        print(xml)
+    else:
+        print(f"Erreur : {response_get.status_code} - {response_get.text}")
     tab=[[url_image_settings_main,"primaire"],[url_image_settings_sub,"secondaire"]]
     for t in tab:
         try:
