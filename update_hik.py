@@ -79,6 +79,22 @@ def is_http_port(camera_ip, username, password, port):
         
 
 
+def getUsers(camera_ip,port,username, password):
+
+        # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
+    url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users'
+    #print(url_image_settings)
+    number=get_param(camera_ip, username, password)
+    port=number[1]
+    # Effectuer une requête HTTP GET
+    response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+
+    # Vérifier si la requête a réussi
+    if response_get.status_code == 200:
+        xml = response_get.text
+        print(xml)
+    else:
+        print(f"Erreur : {response_get.status_code} - {response_get.text}")
 
 ## MODIF RESOLUTION CAM FLUX PRIMAIRE OU SECONDAIRE
 def set_resolution(camera_ip, username, password, channel_id, resolution,cam):
@@ -663,10 +679,8 @@ def encryption(camera_ip, username, password, param):
     else:
         print(f"Erreur : {response.status_code} - {response.text}")
         return
-    if param.lower() == "see":
-        return
     # Modifier la résolution
-    if param.lower() =="on":
+    if param.lower() =="true":
         xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>true</enabled>", xml)
     else:
         xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>false</enabled>", xml)
@@ -1029,7 +1043,7 @@ if __name__ == "__main__":
     parser.add_argument("--b", type=int, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
-    parser.add_argument("--param", type=str, required=False)
+    parser.add_argument("--encrypt", type=str, required=False)
 
     args = parser.parse_args()
     if "{" in args.ip :
@@ -1061,13 +1075,14 @@ if __name__ == "__main__":
             set_compression(args.ip, args.u, args.p, args.ch, args.c,"no")
         if args.m!=None:
             set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
-        if args.param!=None:
-            encryption(args.ip, args.u, args.p, args.param)
+        if args.encrypt!=None:
+            encryption(args.ip, args.u, args.p, args.encrypt)
         if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
         if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters_unique(args.ip, args.u, args.p)
-            
+        if args.user!=None:
+            getUsers(args.ip, args.u, args.p,args.user)
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
