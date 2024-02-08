@@ -82,7 +82,7 @@ def is_http_port(camera_ip, username, password, port):
 def getUsers(camera_ip,username, password,user):
 
         # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-    
+    print(user)
     #print(url_image_settings)
     number=get_param(camera_ip, username, password)
     port=number[1]
