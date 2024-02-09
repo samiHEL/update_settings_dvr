@@ -173,10 +173,15 @@ def getAllSettings(camera_ip, username, password):
     number=numberCam(camera_ip, username, password)
     port=number[1]
     url = f"http://{camera_ip}:{port}/cgi-bin/encode.cgi?action=getConfigCaps"
-    r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password)) 
+    url_user = f"http://{camera_ip}:{port}/cgi-bin/userManager.cgi?action=getUserInfoAll"
+    r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
+    r_user = requests.get(url_user, stream=True, auth=HTTPDigestAuth(username, password))
     print(r.status_code)
     if r.status_code == 200:
                     print("Pour IP "+camera_ip)
+                    print("info user :")
+                    print(r.text)
+                    print("-----------")
                     try:
                         target_line_compression = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.CompressionTypes' in line)
                         # Extraire la valeur de ResolutionTypes à partir de la ligne
