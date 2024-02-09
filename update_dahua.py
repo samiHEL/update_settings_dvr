@@ -179,15 +179,17 @@ def getAllSettings(camera_ip, username, password):
     print(r.status_code)
     if r.status_code == 200:
                     print("Pour IP "+camera_ip)
-                    print("info user :")
+                    print("INFO USER :")
                     text_user=r_user.text
-                    # Définition de l'expression régulière pour extraire les noms et les groupes
+                    # Définition de l'expression régulière pour extraire les noms, les groupes et les AuthorityList
                     name_pattern = re.compile(r"users\[(\d+)\]\.Name=(\w+)")
                     group_pattern = re.compile(r"users\[(\d+)\]\.Group=(\w+)")
+                    authority_pattern = re.compile(r"users\[(\d+)\]\.AuthorityList\[\d+\]=(\w+)")
 
-                    # Recherche des noms et des groupes
+                    # Recherche des noms, des groupes et des AuthorityList
                     names = {}
                     groups = {}
+                    authorities = {}
 
                     for match in name_pattern.finditer(text_user):
                         user_index, name = match.groups()
@@ -197,11 +199,16 @@ def getAllSettings(camera_ip, username, password):
                         user_index, group = match.groups()
                         groups[int(user_index)] = group
 
+                    for match in authority_pattern.finditer(text_user):
+                        user_index, authority = match.groups()
+                        authorities.setdefault(int(user_index), []).append(authority)
+
                     # Affichage des résultats
                     for user_index in names.keys():
                         print("User", user_index)
                         print("Name:", names[user_index])
                         print("Group:", groups[user_index])
+                        print("Droit:", authorities[user_index])
                         print()
                     print("-----------")
                     try:
