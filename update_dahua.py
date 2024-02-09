@@ -129,23 +129,6 @@ def numberCam(camera_ip, username, password):
         else:
             print("nombre de camera introuvable")
             return [1,port]
-            # print("/// Port 80 indisponnible -> Test en cours avec autre port ...")
-            # for port in open_ports:
-            #     url_test=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
-            #     try:
-            #         r = requests.get(url_test, stream=True, auth=HTTPDigestAuth(username, password))
-            #         t=r.text
-            #         matches = re.findall(r'table\.Ptz\[(\d+)\]', t)
-            #         # Obtenir le dernier chiffre trouvé
-            #         if matches:
-            #             dernier_chiffre = int(matches[-1])
-            #             return dernier_chiffre+1
-            #         else:
-            #             print("nombre de camera introuvable")
-            #             return 40
-            #         break
-            #     except:
-            #            print("port "+str(port)+" pas compatible en Http")
                        
                       
 def getinfoCam(camera_ip, username, password, channel_id,cam):
@@ -193,6 +176,7 @@ def getAllSettings(camera_ip, username, password):
     r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password)) 
     print(r.status_code)
     if r.status_code == 200:
+                    print("Pour IP "+camera_ip)
                     try:
                         target_line_compression = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.CompressionTypes' in line)
                         # Extraire la valeur de ResolutionTypes à partir de la ligne
