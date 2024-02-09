@@ -180,7 +180,7 @@ def getAllSettings(camera_ip, username, password):
     if r.status_code == 200:
                     print("Pour IP "+camera_ip)
                     print("info user :")
-                    print(r.text)
+                    print(r_user.text)
                     print("-----------")
                     try:
                         target_line_compression = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.CompressionTypes' in line)
