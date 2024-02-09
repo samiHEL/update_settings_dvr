@@ -180,7 +180,7 @@ def getAllSettings(camera_ip, username, password):
     if r.status_code == 200:
                     print("Pour IP "+camera_ip)
                     print("info user :")
-                    print(r_user.text)
+                    text_user=r_user.text
                     # Définition de l'expression régulière pour extraire les noms et les groupes
                     name_pattern = re.compile(r"users\[(\d+)\]\.Name=(\w+)")
                     group_pattern = re.compile(r"users\[(\d+)\]\.Group=(\w+)")
@@ -189,11 +189,11 @@ def getAllSettings(camera_ip, username, password):
                     names = {}
                     groups = {}
 
-                    for match in name_pattern.finditer(text):
+                    for match in name_pattern.finditer(text_user):
                         user_index, name = match.groups()
                         names[int(user_index)] = name
 
-                    for match in group_pattern.finditer(text):
+                    for match in group_pattern.finditer(text_user):
                         user_index, group = match.groups()
                         groups[int(user_index)] = group
 
