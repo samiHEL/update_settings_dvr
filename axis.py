@@ -121,7 +121,7 @@ def get_stream_profiles(ip,user,mdp):
         print(f"Erreur de connexion : {e}")
 
 
-def create_stream_profiles(ip,user,mdp,res,fps,codec,method,):
+def create_stream_profiles(ip,user,mdp,res,fps,codec,method):
     base_url = "http://"+ip+"/axis-cgi/"
     username = user
     password = mdp

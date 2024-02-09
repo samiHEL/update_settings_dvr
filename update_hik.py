@@ -686,6 +686,7 @@ def get_camera_parameters_unique(camera_ip, username, password):
     url_image_settings_main = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101/capabilities'
     url_image_settings_sub = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/102/capabilities'
     url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users/'
+    print("Pour IP "+camera_ip)
     response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
 
 
@@ -707,7 +708,6 @@ def get_camera_parameters_unique(camera_ip, username, password):
                 #print(xml)
                 root = ET.fromstring(xml)
                 namespace_uri = root.tag.split('}', 1)[0][1:]
-
                 if namespace_uri in ns['ns'] :
 
                     videoCodecTypeElement = root.find('.//ns:videoCodecType', namespaces=ns)
