@@ -181,6 +181,28 @@ def getAllSettings(camera_ip, username, password):
                     print("Pour IP "+camera_ip)
                     print("info user :")
                     print(r_user.text)
+                    # Définition de l'expression régulière pour extraire les noms et les groupes
+                    name_pattern = re.compile(r"users\[(\d+)\]\.Name=(\w+)")
+                    group_pattern = re.compile(r"users\[(\d+)\]\.Group=(\w+)")
+
+                    # Recherche des noms et des groupes
+                    names = {}
+                    groups = {}
+
+                    for match in name_pattern.finditer(text):
+                        user_index, name = match.groups()
+                        names[int(user_index)] = name
+
+                    for match in group_pattern.finditer(text):
+                        user_index, group = match.groups()
+                        groups[int(user_index)] = group
+
+                    # Affichage des résultats
+                    for user_index in names.keys():
+                        print("User", user_index)
+                        print("Name:", names[user_index])
+                        print("Group:", groups[user_index])
+                        print()
                     print("-----------")
                     try:
                         target_line_compression = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.CompressionTypes' in line)
