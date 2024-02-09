@@ -597,7 +597,7 @@ def setDetection(camera_ip, username, password,channel_id,motionDetect,cam):
                     r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
                     print(r.status_code)
                     if r.status_code==401:
-                    print("Unauthorized")
+                        print("Unauthorized")
                     if r.status_code == 200:
                         print(r.text)
                         print("Detection mouvement pour camera "+str(channel_str)+" mise à "+motionDetect.lower()) 
