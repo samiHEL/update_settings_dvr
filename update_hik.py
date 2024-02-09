@@ -693,6 +693,7 @@ def get_camera_parameters_unique(camera_ip, username, password):
     # Vérifier si la requête a réussi
     if response_get.status_code == 200:
         xml = response_get.text
+        print(xml)
     else:
         print(f"Erreur : {response_get.status_code} - {response_get.text}")
     tab=[[url_image_settings_main,"primaire"],[url_image_settings_sub,"secondaire"]]

@@ -53,6 +53,9 @@ python3 update_dahua.py --ip xxx --u admin --p Dahua123 **--ch all_sub** --r 704
 
 python3 update_dahua.py --ip xxx --u admin --p Dahua123 **--ch all_main** --r 704x576 
 
+### Obtenir liste parametres dispo sur la ou les cameras + info droit d'acces lancer :
+
+python3 update_dahua.py --ip xxx --u admin --p Dahua123
 
 
 # Cam IP Dahua ou Hik : 
