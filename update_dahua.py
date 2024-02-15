@@ -5,24 +5,11 @@ import hashlib
 import re
 import argparse
 import ipaddress
-#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/snapshot.cgi?channel=1"
-#ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
-##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
-### GetVideoConfigCaps ###
-#Liste param video #url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/encode.cgi?action=getConfigCaps"
-### GetVideoEncodeConfig ###
-#Bon param video #
-# url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=Encode"
-#VideoColor#
-#url =  "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoColor"
-### SetVideoEncodeConfig ###
-##head="table.Encode[15].SnapFormat[1]"
+#url = "http://user:mdp@ip:80/cgi-bin/........."
 #password=password.encode(encoding="ascii",errors="ignore")
 ##ExtraFormat[0] Pour flux secondaire##
 ##MainFormat[0] Pour flux primaire##
 ## Numero Cam commence à 0 ##
-#width="Encode[10].ExtraFormat[0].Video.Width"
-#height="Encode[10].ExtraFormat[0].Video.Height"
 import subprocess
 import time
 import importlib
@@ -699,4 +686,20 @@ if __name__ == "__main__":
             getinfoCam(args.ip, args.u, args.p,args.ch,"no")
         if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getAllSettings(args.ip, args.u, args.p)
-          
+        
+
+
+
+
+
+#ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
+##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
+### GetVideoConfigCaps ###
+#Liste param video #url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/encode.cgi?action=getConfigCaps"
+### GetVideoEncodeConfig ###
+#Bon param video #
+# url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=Encode"
+#VideoColor#
+#url =  "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoColor"
+### SetVideoEncodeConfig ###
+##head="table.Encode[15].SnapFormat[1]"

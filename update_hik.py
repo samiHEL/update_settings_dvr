@@ -265,9 +265,9 @@ def set_bitrate(camera_ip, username, password, channel_id, BitRate,cam):
             
             # Modifier le bitrate
             try:
-                xml = re.sub(r"<constantBitRate>.*?</constantBitRate>", f"<constantBitRate>{BitRate}</constantBitRate>", xml)
-            except:
                 xml = re.sub(r"<vbrUpperCap>.*?</vbrUpperCap>", f"<vbrUpperCap>{BitRate}</vbrUpperCap>", xml)
+            except:
+                xml = re.sub(r"<constantBitRate>.*?</constantBitRate>", f"<constantBitRate>{BitRate}</constantBitRate>", xml)
 
             # Effectuer la requête HTTP PUT
             response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
