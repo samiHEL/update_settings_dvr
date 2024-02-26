@@ -161,7 +161,7 @@ def getCameraCapacities(ip,idCam):
 def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetype, quality):
     print('Vous avez choisi la caméra '+str(camera)+', voici sa configuration actuelle :')
     getCameraActualConfig(ip,camera)
-    getCameraCapacities(camera)
+    getCameraCapacities(ip, camera)
 
 
     if(flux.lower()=='main'):
