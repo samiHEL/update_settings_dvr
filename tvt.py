@@ -2,6 +2,16 @@ import requests
 from requests.auth import HTTPBasicAuth
 import xml.etree.ElementTree as ET
 import sys
+import argparse
+
+from datetime import datetime
+import pytz
+
+
+
+
+
+
 
 
 def extract_stream_data(xml_str, stream):
@@ -42,11 +52,11 @@ def extract_stream_caps(xml_str, stream):
 
 
 auth = None
-parametre = sys.argv[1]
 
 
-def getNbCameras():
-    url = "http://"+parametre+"/GetChannelList"
+
+def getNbCameras(ip):
+    url = "http://"+ip+"/GetChannelList"
     global auth
     username = input("Entrer username : ")
     password = input("Entrer password : ")
@@ -98,8 +108,8 @@ def getNbCameras():
 
 
 
-def choisir_camera():
-    nbcam = getNbCameras()
+def choisir_camera(ip):
+    nbcam = getNbCameras(ip)
     print("Choisissez la caméra que vous souhaitez modifier (0 pour toutes les caméras, 1-"+str(nbcam)+" pour une caméra spécifique):")
     
     while True:
@@ -113,8 +123,8 @@ def choisir_camera():
         except ValueError:
             print("Veuillez entrer un nombre valide.")
 
-def getCameraActualConfig(idCam):
-    url_actual_config =  "http://"+parametre+"/GetVideoStreamConfig/"+str(idCam)
+def getCameraActualConfig(ip,idCam):
+    url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(idCam)
             # Effectuer la requête GET (ou POST, etc.) avec l'authentification
     response_actual_config = requests.get(url_actual_config, auth=auth)
     if response_actual_config.status_code == 200:
@@ -131,9 +141,9 @@ def getCameraActualConfig(idCam):
     else:
         print('Erreur actual config.')
 
-def getCameraCapacities(idCam):
+def getCameraCapacities(ip,idCam):
     print('Voici ses capacités : \n')
-    url_capacities = "http://"+parametre+"/GetStreamCaps/"+str(idCam)
+    url_capacities = "http://"+ip+"/GetStreamCaps/"+str(idCam)
 
 
         # Effectuer la requête GET (ou POST, etc.) avec l'authentification
@@ -148,7 +158,7 @@ def getCameraCapacities(idCam):
     else:
         print('Erreur capacities.')
 
-def traitement_camera(camera, flux,resolution, framerate, bitrate, encodetype, quality ):
+def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetype, quality ):
     print('Vous avez choisi la caméra '+str(camera)+', voici sa configuration actuelle :')
     getCameraActualConfig(camera)
     getCameraCapacities(camera)
@@ -192,7 +202,7 @@ def traitement_camera(camera, flux,resolution, framerate, bitrate, encodetype, q
 
     </config>'''
 
-    url_set_sub1 = "http://"+parametre+"/SetVideoStreamConfig/"+str(camera)
+    url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(camera)
 
     response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
 
@@ -206,10 +216,81 @@ def traitement_camera(camera, flux,resolution, framerate, bitrate, encodetype, q
 
 
 
+def get_country_time(country):
+    try:
+        # Obtenez le fuseau horaire du pays à partir du code de pays
+        country_timezone = pytz.country_timezones.get(country.upper())
+        if country_timezone:
+            # Convertir l'heure UTC actuelle au fuseau horaire du pays
+            country_time = datetime.now(pytz.timezone(country_timezone[0]))
+            country_time_formatted = country_time.strftime("%Y-%m-%d%%20%H:%M:%S")
+            return country_time_formatted
+
+        else:
+            return f"Impossible de trouver le fuseau horaire pour le pays avec le code {'GB'}."
+    except Exception as e:
+        print("Une erreur s'est produite lors de la récupération de l'heure du pays :", e)
+        return None
+
+# Get the current time in the local time zone
+def setTime(ip, country):
+    username = input("Entrer username : ")
+    password = input("Entrer password : ")
+
+
+    # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
+    auth = HTTPBasicAuth(username, password)
+
+    url_before = "http://"+ip+"/GetDateAndTime"
+    response_before = requests.get(url_before, auth=auth)
+    print(response_before.text)
+
+    local_now_string = get_country_time(country)
+
+
+
+# Afficher la chaîne de caractères résultante
+   ## print(local_now_string)
+
+    url_time = "http://"+ip+"/SetDateAndTime"
+
+    xml_data = '''
+<config version="1.0" xmlns="http://www.ipc.com/ver10">
+        <types>
+                <synchronizeType>
+                        <enum>manually</enum>
+                        <enum>NTP</enum>
+                </synchronizeType>
+        </types>
+        <time>
+                <timezoneInfo>
+                        <timeZone type="string">CET-1CEST,M3.5.0,M10.5.0/3</timeZone>
+                        <daylightSwitch type="boolean">true</daylightSwitch>
+                </timezoneInfo>
+                <synchronizeInfo>
+                        <type type="synchronizeType">manually</type>
+                        <ntpServer type="string" maxLen="127">time.windows.com</ntpServer>
+                        <currentTime type="string"><![CDATA['''+local_now_string+''']]></currentTime>
+                </synchronizeInfo>
+        </time>
+</config>
+'''
+    response_time = requests.post(url_time, auth=auth, data= xml_data)
+    url_after = "http://"+ip+"/GetDateAndTime"
+    response_after = requests.get(url_after, auth=auth)
+    print('New configuration:')
+    print(response_after.text)
+
+
+
+
+
+
+
     
-def traitement():
-    choix_camera = choisir_camera()
-    nbCam = getNbCameras()
+def traitement(ip):
+    choix_camera = choisir_camera(ip)
+    nbCam = getNbCameras(ip)
 
     if(choix_camera==0):
         print('Vous avez choisi toutes les caméras !')
@@ -233,3 +314,18 @@ def traitement():
         encodetype_sub1_input = input('Saisissez le nouveau encode type : ')
         quality_sub1_input = input('Saisissez la nouvelle qualité : ')
         traitement_camera(choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
+
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", type=str, required=True)
+    parser.add_argument("--country", type=str, required=False)
+
+    args = parser.parse_args()
+
+    if args.ip != None and args.country==None:
+        traitement(args.ip)
+    if args.ip != None and args.country!=None:
+        setTime(args.ip, args.country)

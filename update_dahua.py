@@ -13,6 +13,8 @@ import ipaddress
 import subprocess
 import time
 import importlib
+from datetime import datetime
+from dateutil import tz
 
 #CREER LISTE ADRESSE IP QUAND CAM IP
 def expand_ip_range(ip_range):
@@ -623,6 +625,58 @@ def setEncrypt(camera_ip, username, password):
     if r4.status_code == 200:
                     
                     print(r4.text)
+
+def get_country_time(pays):
+    try:
+        # Obtenez le fuseau horaire du pays à partir du code de pays
+        country_timezone = pytz.country_timezones.get(pays.upper())
+        if country_timezone:
+            # Convertir l'heure UTC actuelle au fuseau horaire du pays
+            country_time = datetime.now(pytz.timezone(country_timezone[0]))
+            country_time_formatted = country_time.strftime("%Y-%m-%d%%20%H:%M:%S")
+            return country_time_formatted
+
+        else:
+            return f"Impossible de trouver le fuseau horaire pour le pays avec le code {'GB'}."
+    except Exception as e:
+        print("Une erreur s'est produite lors de la récupération de l'heure du pays :", e)
+        return None
+
+
+def setTime(camera_ip ,username, password, country):
+
+    number=numberCam(camera_ip, username, password)
+    port=number[1]
+
+    # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
+    auth = HTTPDigestAuth(username, password)
+
+    url_before = f"http://{camera_ip}:{port}/cgi-bin/global.cgi?action=getCurrentTime"
+
+
+    response_before = requests.get(url_before, auth=auth, timeout=5)
+    print('Time before change :')
+    print(response_before.text)
+    
+  
+    local_now_string = get_country_time(country)
+
+    url_time = f"http://{camera_ip}:{port}/cgi-bin/global.cgi?action=setCurrentTime&time="+local_now_string
+    response_time = requests.post(url_time, auth=auth, timeout=5)
+    if response_time.status_code == 200:
+        print('Time change successful!')
+
+
+    response_before = requests.get(url_before, auth=auth, timeout=5)
+    print('New Time :')
+    print(response_before.text)
+
+
+
+
+
+
+
 #getinfoCam()
 #setCompression("172.24.14.23","admin","Veesion2023!",8,"H.264")
 if __name__ == "__main__":
@@ -646,6 +700,7 @@ if __name__ == "__main__":
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
     parser.add_argument("--bc", type=str, required=False)
+    parser.add_argument("--country", type=str, required=False)
 
 
     args = parser.parse_args()
@@ -669,6 +724,8 @@ if __name__ == "__main__":
                 getinfoCam(ip, args.u, args.p,args.ch,"yes")
             if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
                 getAllSettings(ip, args.u, args.p)
+            if args.country!=None:
+                setTime(ip, args.u, args.p, args.country)  
     else:
         if args.r!=None:
             setResolution(args.ip, args.u, args.p, args.ch, args.r,"no")
@@ -686,6 +743,8 @@ if __name__ == "__main__":
             getinfoCam(args.ip, args.u, args.p,args.ch,"no")
         if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getAllSettings(args.ip, args.u, args.p)
+        if args.country!=None:
+            setDetection(args.ip, args.u, args.p, args.country)
         
 
 

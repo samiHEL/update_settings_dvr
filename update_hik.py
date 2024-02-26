@@ -13,7 +13,8 @@ ns6 = {'xmlns': 'http://www.isapi.org/ver20/XMLSchema'}
 
 
 
-
+from datetime import datetime
+import pytz
 import subprocess
 import time
 import importlib
@@ -1005,6 +1006,68 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
             print(f"Erreur : {response.status_code} - {response.text}")
 
 
+
+def get_country_time(pays):
+    try:
+        # Obtenez le fuseau horaire du pays à partir du code de pays
+        country_timezone = pytz.country_timezones.get(pays.upper())
+        if country_timezone:
+            # Convertir l'heure UTC actuelle au fuseau horaire du pays
+            country_time = datetime.now(pytz.timezone(country_timezone[0]))
+            country_time_formatted = country_time.strftime("%Y-%m-%dT%H:%M:%S")
+            return country_time_formatted
+
+        else:
+            return f"Impossible de trouver le fuseau horaire pour le pays avec le code {'GB'}."
+    except Exception as e:
+        print("Une erreur s'est produite lors de la récupération de l'heure du pays :", e)
+        return None
+
+def setTime(camera_ip, username, password, country):
+        number=get_param(camera_ip, username, password)
+        port=number[1]
+        url_image_settings = f'http://{camera_ip}:{port}/ISAPI/System/time'
+        response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+        if response_get.status_code == 200:
+            xml = response_get.text
+            root = ET.fromstring(xml)
+
+            # Find the <localTime> element and retrieve its text content
+            local_time_element = root.find('.//{http://www.std-cgi.com/ver20/XMLSchema}localTime')
+            local_time_content = local_time_element.text
+            print('Time before change :')
+            print(local_time_content)
+        else:
+            print(f"Erreur : {response_get.status_code} - {response_get.text}")
+        time = get_country_time(country)
+        xml = re.sub(r"<localTime>.*?</localTime>", f"<localTime>{time}</localTime>", xml)
+        response_put = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
+        if response_put.status_code == 200:
+            print('Time change successful!')
+        else:
+            print(f"Erreur : {response_put.status_code} - {response_put.text}")
+
+        response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+        if response_get.status_code == 200:
+            xml1 = response_get.text
+            root1 = ET.fromstring(xml1)
+                        # Find the <localTime> element and retrieve its text content
+            local_time_element1 = root1.find('.//{http://www.std-cgi.com/ver20/XMLSchema}localTime')
+            local_time_content1 = local_time_element1.text
+            print('New time :')
+            print(local_time_content1)
+        else:
+            print(f"Erreur : {response_get.status_code} - {response_get.text}")
+
+
+
+
+
+
+
+
+
+
 def print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video):
     print('ID Channel :', id_channel)
     print('Resolution : ', str(width_resolution)+"x"+str(height_resolution))
@@ -1036,6 +1099,8 @@ if __name__ == "__main__":
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
     parser.add_argument("--encrypt", type=str, required=False)
+    parser.add_argument("--country", type=str, required=False)
+
 
     args = parser.parse_args()
     if "{" in args.ip :
@@ -1056,6 +1121,8 @@ if __name__ == "__main__":
                     get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
                 if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                     get_camera_parameters_unique(ip, args.u, args.p)
+                if args.country!=None:
+                    setTime(ip, args.u, args.p, args.country)
     else:
         if args.r!=None:
             set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
@@ -1073,6 +1140,8 @@ if __name__ == "__main__":
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
         if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters_unique(args.ip, args.u, args.p)
+        if args.country!=None:
+            encryption(args.ip, args.u, args.p, args.country)
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
