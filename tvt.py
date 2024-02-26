@@ -223,7 +223,7 @@ def get_country_time(country):
         if country_timezone:
             # Convertir l'heure UTC actuelle au fuseau horaire du pays
             country_time = datetime.now(pytz.timezone(country_timezone[0]))
-            country_time_formatted = country_time.strftime("%Y-%m-%d%%20%H:%M:%S")
+            country_time_formatted = country_time.strftime("%Y-%m-%d %H:%M:%S")
             return country_time_formatted
 
         else:
