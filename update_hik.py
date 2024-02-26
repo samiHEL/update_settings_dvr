@@ -306,6 +306,90 @@ def set_bitrate(camera_ip, username, password, channel_id, BitRate,cam):
             print("Le bitrate a été modifiée avec succès.")
         else:
             print(f"Erreur : {response.status_code} - {response.text}")
+
+
+
+
+
+## MODIF BITREATE CAM ##
+def set_bitrateControl(camera_ip, username, password, channel_id, bcr,cam):
+    number=get_param(camera_ip, username, password)
+    port=number[1]
+    nbCam=int(number[0])
+    if cam == "yes":
+        nbCam = 1
+    if "all"in channel_id:
+        for x in range(nbCam):
+            print(x+1)
+            if channel_id=="all_main":
+                channel=x+1
+                channel2=str(channel)+"01"
+            elif channel_id=="all_sub":
+                channel=x+1
+                channel2=str(channel)+"02"
+            # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
+            url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}'
+            #print(url_image_settings)
+
+            # Effectuer une requête HTTP GET
+            response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+
+            # Vérifier si la requête a réussi
+            if response_get.status_code == 200:
+                xml = response_get.text
+            else:
+                print(f"Erreur : {response_get.status_code} - {response_get.text}")
+
+            # Modifier la résolution
+
+            
+            # Modifier le bitrate
+            try:
+                xml = re.sub(r"<videoQualityControlType>.*?</videoQualityControlType>", f"<videoQualityControlType>{bcr}</videoQualityControlType>", xml)
+            except:
+                xml = re.sub(r"<videoQualityControlType>.*?</videoQualityControlType>", f"<videoQualityControlType>{bcr}</videoQualityControlType>", xml)
+
+            # Effectuer la requête HTTP PUT
+            response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
+
+            # Vérifier si la requête a réussi
+            if response.status_code == 200:
+                print("Bitrate pour camera "+str(channel2)+" mise à "+str(bcr)) 
+            else:
+                print(f"Erreur : {response.status_code} - {response.text}")
+    else:
+  
+        # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
+        url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel_id}'
+
+        # Effectuer une requête HTTP GET
+        response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+
+        # Vérifier si la requête a réussi
+        if response_get.status_code == 200:
+            xml = response_get.text
+        else:
+            print(f"Erreur : {response_get.status_code} - {response_get.text}")
+
+        # Modifier le bitrate
+        try:
+            xml = re.sub(r"<videoQualityControlType>.*?</videoQualityControlType>", f"<videoQualityControlType>{bcr}</videoQualityControlType>", xml)
+        except:
+            xml = re.sub(r"<videoQualityControlType>.*?</videoQualityControlType>", f"<videoQualityControlType>{bcr}</videoQualityControlType>", xml)
+
+        # Effectuer la requête HTTP PUT
+        response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
+
+        # Vérifier si la requête a réussi
+        if response.status_code == 200:
+            print("Le bitrate Control a été modifiée avec succès.")
+        else:
+            print(f"Erreur : {response.status_code} - {response.text}")
+
+
+
+
+
 def set_compression(camera_ip, username, password, channel_id, compression,cam):
     number=get_param(camera_ip, username, password)
     port=number[1]
@@ -1098,6 +1182,7 @@ if __name__ == "__main__":
     parser.add_argument("--b", type=int, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--m", type=str, required=False)
+    parser.add_argument("--bc", type=str, required=False)
     parser.add_argument("--encrypt", type=str, required=False)
     parser.add_argument("--country", type=str, required=False)
 
@@ -1123,6 +1208,8 @@ if __name__ == "__main__":
                     get_camera_parameters_unique(ip, args.u, args.p)
                 if args.country!=None:
                     setTime(ip, args.u, args.p, args.country)
+                if args.bc!=None:
+                    set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
     else:
         if args.r!=None:
             set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
@@ -1142,6 +1229,8 @@ if __name__ == "__main__":
             get_camera_parameters_unique(args.ip, args.u, args.p)
         if args.country!=None:
             encryption(args.ip, args.u, args.p, args.country)
+        if args.bc!=None:
+            set_bitrateControl(args.ip, args.u, args.p, args.ch, args.bc, "no")
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
