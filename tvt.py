@@ -300,7 +300,7 @@ def traitement(ip):
         bitrate_sub1_input = input('Saisissez le nouveau type bitrate (CBR/VBR): ')
         encodetype_sub1_input = input('Saisissez le nouveau encode type (h264/h265) : ')
         quality_sub1_input = input('Saisissez la nouvelle qualité (lowest/lower/medium/higher/highest): ')
-        for camera in range(nbCam):
+        for camera in range(int(nbCam)):
             traitement_camera(ip, choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
 
 
