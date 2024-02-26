@@ -160,7 +160,7 @@ def getCameraCapacities(ip,idCam):
 
 def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetype, quality):
     print('Vous avez choisi la caméra '+str(camera)+', voici sa configuration actuelle :')
-    getCameraActualConfig(camera)
+    getCameraActualConfig(ip,camera)
     getCameraCapacities(camera)
 
 
@@ -210,7 +210,7 @@ def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetyp
     if response_set_sub1.status_code == 200:
         print('Modification réussie ! Voici la nouvelle configuration\n')
 
-        getCameraActualConfig(camera)
+        getCameraActualConfig(ip,camera)
 
 
 
