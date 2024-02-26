@@ -317,6 +317,7 @@ def setResolution(camera_ip, username, password, channel_id,resolution,cam):
                     print("Pas bon format !")
             else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
+      
     
 def setFps(camera_ip, username, password, channel_id, fps,cam):
     number=numberCam(camera_ip, username, password)
@@ -374,6 +375,8 @@ def setFps(camera_ip, username, password, channel_id, fps,cam):
                     print("Pas bon format !")
             else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
+
+
 def setBitrate(camera_ip, username, password, channel_id, bitrate,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
@@ -512,7 +515,7 @@ def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole,cam):
                 if r.status_code==401:
                     print("Unauthorized")
                 if r.status_code == 200:
-                                print("FPS pour camera "+str(x+1)+" mise à "+str(Bcontrole))
+                                print("BitRate Control pour camera "+str(x+1)+" mis à "+str(Bcontrole))
                 elif r.status_code == 400:
                     print("Pas bon format !")
                 else : 
@@ -520,7 +523,7 @@ def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole,cam):
                     
             
             elif channel_id.lower()=="all_main":   
-                bcontrole=f"Encode[{x}].MainFormat[0].Video.FPS"
+                bcontrole=f"Encode[{x}].MainFormat[0].Video.BitRateControl"
                 url_bcontrole = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bcontrole}={Bcontrole}"
                 print(url_bcontrole)
                 r = requests.put(url_bcontrole, stream=True, auth=HTTPDigestAuth(username, password)) 
@@ -528,14 +531,14 @@ def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole,cam):
                 if r.status_code==401:
                     print("Unauthorized")
                 if r.status_code == 200:
-                                print("FPS pour camera "+str(x+1)+" mise à "+str(Bcontrole))
+                                print("BitRate Control pour camera "+str(x+1)+" mis à "+str(Bcontrole))
                 elif r.status_code == 400:
                     print("Pas bon format !")
                 else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
     else:
             channel_id=int(channel_id)-1
-            bcontrole=f"Encode[{channel_id}].ExtraFormat[0].Video.FPS"
+            bcontrole=f"Encode[{channel_id}].ExtraFormat[0].Video.BitRateControl"
             url_bcontrole = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bcontrole}={Bcontrole}"
             print(url_bcontrole)
             r = requests.put(url_bcontrole, stream=True, auth=HTTPDigestAuth(username, password)) 
@@ -543,7 +546,7 @@ def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole,cam):
             if r.status_code==401:
                     print("Unauthorized")
             if r.status_code == 200:
-                            print("FPS pour camera "+str(channel_id)+" mise à "+str(Bcontrole)) 
+                            print("BitRate Control pour camera "+str(channel_id)+" mis à "+str(Bcontrole)) 
             elif r.status_code == 400:
                     print("Pas bon format !")
             else : 
