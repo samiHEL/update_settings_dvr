@@ -11,10 +11,8 @@ import ipaddress
 ##MainFormat[0] Pour flux primaire##
 ## Numero Cam commence à 0 ##
 import subprocess
-import time
-import importlib
 from datetime import datetime
-from dateutil import tz
+import pytz
 
 #CREER LISTE ADRESSE IP QUAND CAM IP
 def expand_ip_range(ip_range):
