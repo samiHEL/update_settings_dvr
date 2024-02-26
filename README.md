@@ -93,7 +93,7 @@ python3 update_dahua.py --ip xxx --u admin --p Dahua123 **--ch (all_main, all_su
 
 --c (H.264,H.265)
 
---cb (CBR ou VBR)
+--bc (CBR ou VBR)
 
 --m (false ou true) motion
 
