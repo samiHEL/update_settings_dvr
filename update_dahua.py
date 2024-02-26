@@ -744,7 +744,7 @@ if __name__ == "__main__":
         if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getAllSettings(args.ip, args.u, args.p)
         if args.country!=None:
-            setDetection(args.ip, args.u, args.p, args.country)
+            setTime(args.ip, args.u, args.p, args.country)
         
 
 
