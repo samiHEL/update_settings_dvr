@@ -32,6 +32,8 @@ python3 update_hik.py --ip xxx --u admin --p Hikvision **--ch all_main OU all_su
 
 --b (bitrate)
 
+--bc (CBR/VBR)
+
 --c (H.264,H.265) (compression)
 
 --m (false ou true) (motionDetect)
