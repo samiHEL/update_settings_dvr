@@ -93,6 +93,8 @@ python3 update_dahua.py --ip xxx --u admin --p Dahua123 **--ch (all_main, all_su
 
 --c (H.264,H.265)
 
+--bc (CBR ou VBR)
+
 --m (false ou true) motion
 
 **RAPPEL =** "XXX.XXX.XXX.{XXX,XXX,XXX}" quand cam ip
