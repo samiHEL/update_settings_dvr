@@ -124,3 +124,15 @@ python3 axis.py --ip 10.151.214.51 --u root --p pass --r 768x576 --f 10 --c h.26
 --c (h.264)
 
 --m (update ou create)
+
+
+
+## Ressources documentations APIs
+- ** HIK **
+  https://www.docdroid.net/wlD2i8v/hikvision-isapi-26-ipmd-service-pdf
+- ** DAHUA **
+  https://community.jeedom.com/uploads/short-url/tTQJPaNah7gZnU12VGGN9ZHEhOk.pdf
+- ** AXIS **
+
+- ** TVT **
+  http://kamery.elnika.cz/update/tvt/RTSP_FW3.0_opened_telnet/3535NVR/20151222/TVTAPI1.4.pdf
