@@ -158,7 +158,7 @@ def getCameraCapacities(ip,idCam):
     else:
         print('Erreur capacities.')
 
-def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetype, quality ):
+def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetype, quality):
     print('Vous avez choisi la caméra '+str(camera)+', voici sa configuration actuelle :')
     getCameraActualConfig(camera)
     getCameraCapacities(camera)
@@ -297,23 +297,21 @@ def traitement(ip):
         flux = input('Flux (main/sub1)')
         resolution_sub1_input = input('Saisissez la nouvelle résolution : ')
         framerate_sub1_input = input('Saisissez le nouveau framerate : ')
-        bitrate_sub1_input = input('Saisissez le nouveau bitrate : ')
-        encodetype_sub1_input = input('Saisissez le nouveau encode type : ')
-        quality_sub1_input = input('Saisissez la nouvelle qualité : ')
+        bitrate_sub1_input = input('Saisissez le nouveau type bitrate (CBR/VBR): ')
+        encodetype_sub1_input = input('Saisissez le nouveau encode type (h264/h265) : ')
+        quality_sub1_input = input('Saisissez la nouvelle qualité (lowest/lower/medium/higher/highest): ')
         for camera in range(nbCam):
-            traitement_camera(choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
-
-
+            traitement_camera(ip, choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
 
 
     else:
         flux = input('Flux (main/sub1)')
         resolution_sub1_input = input('Saisissez la nouvelle résolution : ')
         framerate_sub1_input = input('Saisissez le nouveau framerate : ')
-        bitrate_sub1_input = input('Saisissez le nouveau bitrate : ')
-        encodetype_sub1_input = input('Saisissez le nouveau encode type : ')
-        quality_sub1_input = input('Saisissez la nouvelle qualité : ')
-        traitement_camera(choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
+        bitrate_sub1_input = input('Saisissez le nouveau bitrate (CBR/VBR) : ')
+        encodetype_sub1_input = input('Saisissez le nouveau encode type (h264/h265) : ')
+        quality_sub1_input = input('Saisissez la nouvelle qualité (lowest/lower/medium/higher/highest): ')
+        traitement_camera(ip, choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
 
 
 
