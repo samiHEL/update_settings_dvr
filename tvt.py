@@ -36,8 +36,9 @@ def scan_ports(target_ip):
         for line in lines:
             if '/tcp' in line:
                 port = int(line.split('/')[0])
-                open_ports.append(port)
-                print(f"Port {port} is open")
+                if port != 554:
+                    open_ports.append(port)
+                    print(f"Port {port} is open")
 
         return open_ports
     else:
