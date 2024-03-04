@@ -74,9 +74,6 @@ def getNbCameras(ip, username, password):
         
         # Vérifier si la réponse contient des données
         if response.text:  
-
-            print(response.text)  # Afficher le contenu brut de la réponse en cas d'échec du décodage JSON
-                        # Parser le XML
             try:
                 # Parser le XML
                 root = ET.fromstring(response.text)
@@ -106,43 +103,44 @@ def getNbCameras(ip, username, password):
 
 
 
-def getCameraActualConfig(ip,username, password, channels):
-    total_cameras = getNbCameras(ip,username,password)
-    if(channels == 'all_main'):
-        for camera in range(int(total_cameras)):
-            url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(camera)
-            response_actual_config = requests.get(url_actual_config, auth=auth)
-            if response_actual_config.status_code == 200:
-                # Vérifier si la réponse contient des données
-                if response_actual_config.text:
-                    print('\n==========================================================\n')
-                    print("Main Stream :\n")
-                    extract_stream_data(response_actual_config.text, "main")
-            print('\n==========================================================\n')
-    elif(channels == 'all_sub'):
-        for camera in range(int(total_cameras)):
-            url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(camera)
-            response_actual_config = requests.get(url_actual_config, auth=auth)
-            if response_actual_config.status_code == 200:
-                # Vérifier si la réponse contient des données
-                if response_actual_config.text:
-                    print('\n==========================================================\n')
-                    print("Secondary Stream :\n")
-                    extract_stream_data(response_actual_config.text, "sub1")
-            print('\n==========================================================\n')
-    
-    else:
-            url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(channels)
-            response_actual_config = requests.get(url_actual_config, auth=auth)
-            if response_actual_config.status_code == 200:
-                # Vérifier si la réponse contient des données
-                if response_actual_config.text:
-                    print('\n==========================================================\n')
-                    print("Main Stream :\n")
-                    extract_stream_data(response_actual_config.text, "main")
-                    print("Secondary Stream :\n")
-                    extract_stream_data(response_actual_config.text, "sub1")
-            print('\n==========================================================\n')
+def getCameraActualConfig(ip,username, password, channels, caractere):
+    if(caractere =="yes"):
+        total_cameras = getNbCameras(ip,username,password)
+        if(channels == 'all_main'):
+            for camera in range(int(total_cameras)):
+                url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(camera)
+                response_actual_config = requests.get(url_actual_config, auth=auth)
+                if response_actual_config.status_code == 200:
+                    # Vérifier si la réponse contient des données
+                    if response_actual_config.text:
+                        print('\n==========================================================\n')
+                        print("Main Stream :\n")
+                        extract_stream_data(response_actual_config.text, "main")
+                print('\n==========================================================\n')
+        elif(channels == 'all_sub'):
+            for camera in range(int(total_cameras)):
+                url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(camera)
+                response_actual_config = requests.get(url_actual_config, auth=auth)
+                if response_actual_config.status_code == 200:
+                    # Vérifier si la réponse contient des données
+                    if response_actual_config.text:
+                        print('\n==========================================================\n')
+                        print("Secondary Stream :\n")
+                        extract_stream_data(response_actual_config.text, "sub1")
+                print('\n==========================================================\n')
+        
+        else:
+                url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(channels)
+                response_actual_config = requests.get(url_actual_config, auth=auth)
+                if response_actual_config.status_code == 200:
+                    # Vérifier si la réponse contient des données
+                    if response_actual_config.text:
+                        print('\n==========================================================\n')
+                        print("Main Stream :\n")
+                        extract_stream_data(response_actual_config.text, "main")
+                        print("Secondary Stream :\n")
+                        extract_stream_data(response_actual_config.text, "sub1")
+                print('\n==========================================================\n')
 
 
 
@@ -165,7 +163,6 @@ def getCameraCapacities(ip, username, password):
         print('Erreur capacities.')
 
 
-##        traitement_camera(args.ip, args.u, args.p, args.ch, args.r, args.f, args.b, args.c, args.q)
 def traitement_camera(ip, username, password, channels, resolution, fps, bitrate, compression, quality):
 
     total_cameras = getNbCameras(ip,username,password)
@@ -336,7 +333,7 @@ if __name__ == "__main__":
 
         ##GET ACTUAL CONFIGURATION
     if args.ip != None and args.u != None and args.p!= None  and args.ch != None and args.r== None and args.f== None and args.b== None and args.c== None and args.q== None and args.country==None:
-       getCameraActualConfig(args.ip, args.u, args.p, args.ch)
+       getCameraActualConfig(args.ip, args.u, args.p, args.ch, "yes")
        
        ##SET TIME
     if args.ip != None and args.u != None and args.p!= None and args.country!=None:
