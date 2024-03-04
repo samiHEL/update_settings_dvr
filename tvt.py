@@ -246,7 +246,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
 
         response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
         if response_set_sub1.status_code == 200:
-            print('Modification réussie pour la caméra \n'+str(camera))
+            print('Modification réussie pour la caméra \n'+str(channels))
 
 
 
