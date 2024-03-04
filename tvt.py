@@ -113,7 +113,7 @@ def getCameraActualConfig(ip,username, password, channels, caractere):
                 if response_actual_config.status_code == 200:
                     # Vérifier si la réponse contient des données
                     if response_actual_config.text:
-                        print('\n============Camera +'str(camera)+'================\n')
+                        print('\n============Camera '+str(camera)+'================\n')
                         print("Main Stream :\n")
                         extract_stream_data(response_actual_config.text, "main")
                 print('\n==========================================================\n')
@@ -124,7 +124,7 @@ def getCameraActualConfig(ip,username, password, channels, caractere):
                 if response_actual_config.status_code == 200:
                     # Vérifier si la réponse contient des données
                     if response_actual_config.text:
-                        print('\n============Camera +'str(camera)+'================\n')
+                        print('\n============Camera '+str(camera)+'================\n')
                         print("Secondary Stream :\n")
                         extract_stream_data(response_actual_config.text, "sub1")
                 print('\n==========================================================\n')
