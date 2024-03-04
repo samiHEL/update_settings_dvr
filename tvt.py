@@ -12,8 +12,6 @@ import pytz
 
 
 
-
-
 def extract_stream_data(xml_str, stream):
    
     # Parser le XML
@@ -117,7 +115,7 @@ def choisir_camera(ip):
             choix = int(input("Votre choix : "))
             if 0 <= choix <= int(nbcam):
                 ###print(choix)
-                return choix
+                return nbcam,choix
             else:
                 print("Veuillez entrer un nombre entre 0 et"+str(nbcam)+".")
         except ValueError:
@@ -289,8 +287,7 @@ def setTime(ip, country):
 
     
 def traitement(ip):
-    choix_camera = choisir_camera(ip)
-    nbCam = getNbCameras(ip)
+    nbCam,choix_camera = getNbCameras(ip)
 
     if(choix_camera==0):
         print('Vous avez choisi toutes les caméras !')
