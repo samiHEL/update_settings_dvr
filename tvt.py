@@ -47,18 +47,18 @@ def scan_ports(target_ip):
 
 
 
-def is_http_port(camera_ip, username, password, port):
+def is_http_port(ip, username, password, port):
     url = f'http://www.google.com:{port}' 
-    url2 = f'http://{camera_ip}:{port}/GetChannelList'
-    
+    url2 = "http://"+str(ip)+str(port)+"/GetChannelList"
+    print(url2)
     try:
-        r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
+        r = requests.get(url, stream=True, auth=HTTPBasicAuth(username, password), timeout=5)
         r.raise_for_status()
         print("test fonctionnel avec port  "+str(port))
         return True  # La connexion a réussi, donc c'est potentiellement un port HTTP
     except (requests.exceptions.RequestException):
         try:
-            r = requests.get(url2, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
+            r = requests.get(url2, stream=True, auth=HTTPBasicAuth(username, password), timeout=10)
             r.raise_for_status()
             print("test fonctionnel avec port  "+str(port))
             return True
