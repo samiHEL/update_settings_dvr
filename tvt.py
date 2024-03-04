@@ -226,7 +226,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
         if(fps!=None):
             xml_data += '''<frameRate type="uint32">'''+str(fps)+'''</frameRate>'''
 
-        if(bitrate!=''):
+        if(bitrate!=None):
             xml_data += '''<bitRateType type="bitRateType">'''+str(bitrate)+'''</bitRateType>'''
 
         if(compression!=None):
