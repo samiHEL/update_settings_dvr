@@ -53,11 +53,10 @@ auth = None
 
 
 
-def getNbCameras(ip):
+def getNbCameras(ip, username, password):
     url = "http://"+ip+"/GetChannelList"
     global auth
-    username = input("Entrer username : ")
-    password = input("Entrer password : ")
+
 
 
     # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
@@ -106,42 +105,51 @@ def getNbCameras(ip):
 
 
 
-def choisir_camera(ip):
-    nbcam = getNbCameras(ip)
-    print("Choisissez la caméra que vous souhaitez modifier (0 pour toutes les caméras, 1-"+str(nbcam)+" pour une caméra spécifique):")
-    
-    while True:
-        try:
-            choix = int(input("Votre choix : "))
-            if 0 <= choix <= int(nbcam):
-                ###print(choix)
-                return nbcam,choix
-            else:
-                print("Veuillez entrer un nombre entre 0 et"+str(nbcam)+".")
-        except ValueError:
-            print("Veuillez entrer un nombre valide.")
 
-def getCameraActualConfig(ip,idCam):
-    url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(idCam)
-            # Effectuer la requête GET (ou POST, etc.) avec l'authentification
-    response_actual_config = requests.get(url_actual_config, auth=auth)
-    if response_actual_config.status_code == 200:
+def getCameraActualConfig(ip,username, password, channels):
+    total_cameras = getNbCameras(ip,username,password)
+    if(channels == 'all_main'):
+        for camera in range(int(total_cameras)):
+            url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(camera)
+            response_actual_config = requests.get(url_actual_config, auth=auth)
+            if response_actual_config.status_code == 200:
                 # Vérifier si la réponse contient des données
-        if response_actual_config.text:
+                if response_actual_config.text:
+                    print('\n==========================================================\n')
+                    print("Main Stream :\n")
+                    extract_stream_data(response_actual_config.text, "main")
             print('\n==========================================================\n')
-            print("Main Stream :\n")
-            extract_stream_data(response_actual_config.text, "main")
-            print("Secondary Stream :\n")
-            extract_stream_data(response_actual_config.text, "sub1")
+    elif(channels == 'all_sub'):
+        for camera in range(int(total_cameras)):
+            url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(camera)
+            response_actual_config = requests.get(url_actual_config, auth=auth)
+            if response_actual_config.status_code == 200:
+                # Vérifier si la réponse contient des données
+                if response_actual_config.text:
+                    print('\n==========================================================\n')
+                    print("Secondary Stream :\n")
+                    extract_stream_data(response_actual_config.text, "sub1")
             print('\n==========================================================\n')
-        else:
-            print("La réponse est vide.")
+    
     else:
-        print('Erreur actual config.')
+            url_actual_config =  "http://"+ip+"/GetVideoStreamConfig/"+str(channels)
+            response_actual_config = requests.get(url_actual_config, auth=auth)
+            if response_actual_config.status_code == 200:
+                # Vérifier si la réponse contient des données
+                if response_actual_config.text:
+                    print('\n==========================================================\n')
+                    print("Main Stream :\n")
+                    extract_stream_data(response_actual_config.text, "main")
+                    print("Secondary Stream :\n")
+                    extract_stream_data(response_actual_config.text, "sub1")
+            print('\n==========================================================\n')
 
-def getCameraCapacities(ip,idCam):
+
+
+def getCameraCapacities(ip, username, password):
+    total_cameras = getNbCameras(ip, username, password)
     print('Voici ses capacités : \n')
-    url_capacities = "http://"+ip+"/GetStreamCaps/"+str(idCam)
+    url_capacities = "http://"+ip+"/GetStreamCaps/1"
 
 
         # Effectuer la requête GET (ou POST, etc.) avec l'authentification
@@ -156,59 +164,92 @@ def getCameraCapacities(ip,idCam):
     else:
         print('Erreur capacities.')
 
-def traitement_camera(ip, camera, flux,resolution, framerate, bitrate, encodetype, quality):
-    print('Vous avez choisi la caméra '+str(camera)+', voici sa configuration actuelle :')
-    getCameraActualConfig(ip,camera)
-    getCameraCapacities(ip, camera)
+
+##        traitement_camera(args.ip, args.u, args.p, args.ch, args.r, args.f, args.b, args.c, args.q)
+def traitement_camera(ip, username, password, channels, resolution, fps, bitrate, compression, quality):
+
+    total_cameras = getNbCameras(ip,username,password)
+    if not channels.isdigit():
+        if(channels.lower()=='main' or channels.lower()=='all_main'):
+
+            xml_data = '''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <config version="1.0" xmlns="http://www.ipc.com/ver10">
+    <streams type="list" count="2">
+                    <item id="0">
+    '''
+        elif(channels.lower()=='sub' or channels.lower()=='all_sub'):
+            xml_data = '''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <config version="1.0" xmlns="http://www.ipc.com/ver10">
+    <streams type="list" count="2">
+                    <item id="1">
+    '''
 
 
-    if(flux.lower()=='main'):
+        if(resolution!=None):
+            xml_data += '''<resolution>'''+str(resolution)+'''</resolution>'''
 
-        xml_data = '''
-<?xml version="1.0" encoding="UTF-8"?>
-<config version="1.0" xmlns="http://www.ipc.com/ver10">
-<streams type="list" count="2">
-                <item id="0">
-'''
+        if(fps!=None):
+            xml_data += '''<frameRate type="uint32">'''+str(fps)+'''</frameRate>'''
+
+        if(bitrate!=''):
+            xml_data += '''<bitRateType type="bitRateType">'''+str(bitrate)+'''</bitRateType>'''
+
+        if(compression!=None):
+            xml_data += '''<encodeType>'''+str(compression)+'''</encodeType>'''
+
+        if(quality!=None):
+            xml_data += '''<quality type="quality">'''+str(quality)+'''</quality>'''
+
+        xml_data+= '''
+                    </item>
+                </streams>
+
+        </config>'''
+
+        for camera in range(int(total_cameras)):
+            url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(camera)
+
+            response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
+        if response_set_sub1.status_code == 200:
+            print('Modification réussie pour la caméra \n'+str(camera))
     else:
         xml_data = '''
-<?xml version="1.0" encoding="UTF-8"?>
-<config version="1.0" xmlns="http://www.ipc.com/ver10">
-<streams type="list" count="2">
-                <item id="1">
-'''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <config version="1.0" xmlns="http://www.ipc.com/ver10">
+    <streams type="list" count="2">
+                    <item id="1">
+    '''
 
 
-    if(resolution!=''):
-        xml_data += '''<resolution>'''+str(resolution)+'''</resolution>'''
+        if(resolution!=None):
+            xml_data += '''<resolution>'''+str(resolution)+'''</resolution>'''
 
-    if(framerate!=''):
-        xml_data += '''<frameRate type="uint32">'''+str(framerate)+'''</frameRate>'''
+        if(fps!=None):
+            xml_data += '''<frameRate type="uint32">'''+str(fps)+'''</frameRate>'''
 
-    if(bitrate!=''):
-        xml_data += '''<bitRateType type="bitRateType">'''+str(bitrate)+'''</bitRateType>'''
+        if(bitrate!=''):
+            xml_data += '''<bitRateType type="bitRateType">'''+str(bitrate)+'''</bitRateType>'''
 
-    if(encodetype!=''):
-        xml_data += '''<encodeType>'''+str(encodetype)+'''</encodeType>'''
+        if(compression!=None):
+            xml_data += '''<encodeType>'''+str(compression)+'''</encodeType>'''
 
-    if(quality!=''):
-        xml_data += '''<quality type="quality">'''+str(quality)+'''</quality>'''
+        if(quality!=None):
+            xml_data += '''<quality type="quality">'''+str(quality)+'''</quality>'''
 
-    xml_data+= '''
-                </item>
-            </streams>
+        xml_data+= '''
+                    </item>
+                </streams>
 
-    </config>'''
+        </config>'''
 
-    url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(camera)
+        
+        url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(channels)
 
-    response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
-
-
-    if response_set_sub1.status_code == 200:
-        print('Modification réussie ! Voici la nouvelle configuration\n')
-
-        getCameraActualConfig(ip,camera)
+        response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
+        if response_set_sub1.status_code == 200:
+            print('Modification réussie pour la caméra \n'+str(camera))
 
 
 
@@ -231,25 +272,14 @@ def get_country_time(country):
         return None
 
 # Get the current time in the local time zone
-def setTime(ip, country):
-    username = input("Entrer username : ")
-    password = input("Entrer password : ")
+def setTime(ip, username, password, country):
 
-
-    # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
     auth = HTTPBasicAuth(username, password)
-
     url_before = "http://"+ip+"/GetDateAndTime"
     response_before = requests.get(url_before, auth=auth)
     print(response_before.text)
 
     local_now_string = get_country_time(country)
-
-
-
-# Afficher la chaîne de caractères résultante
-   ## print(local_now_string)
-
     url_time = "http://"+ip+"/SetDateAndTime"
 
     xml_data = '''
@@ -286,41 +316,37 @@ def setTime(ip, country):
 
 
     
-def traitement(ip):
-    nbCam,choix_camera = getNbCameras(ip)
-
-    if(choix_camera==0):
-        print('Vous avez choisi toutes les caméras !')
-        flux = input('Flux (main/sub1)')
-        resolution_sub1_input = input('Saisissez la nouvelle résolution : ')
-        framerate_sub1_input = input('Saisissez le nouveau framerate : ')
-        bitrate_sub1_input = input('Saisissez le nouveau type bitrate (CBR/VBR): ')
-        encodetype_sub1_input = input('Saisissez le nouveau encode type (h264/h265) : ')
-        quality_sub1_input = input('Saisissez la nouvelle qualité (lowest/lower/medium/higher/highest): ')
-        for camera in range(int(nbCam)):
-            traitement_camera(ip, camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
-
-
-    else:
-        flux = input('Flux (main/sub1)')
-        resolution_sub1_input = input('Saisissez la nouvelle résolution : ')
-        framerate_sub1_input = input('Saisissez le nouveau framerate : ')
-        bitrate_sub1_input = input('Saisissez le nouveau bitrate (CBR/VBR) : ')
-        encodetype_sub1_input = input('Saisissez le nouveau encode type (h264/h265) : ')
-        quality_sub1_input = input('Saisissez la nouvelle qualité (lowest/lower/medium/higher/highest): ')
-        traitement_camera(ip, choix_camera,flux,resolution_sub1_input, framerate_sub1_input,bitrate_sub1_input, encodetype_sub1_input, quality_sub1_input)
-
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, required=True)
+    parser.add_argument("--u", type=str, required=True)
+    parser.add_argument("--p", type=str, required=True)
+    parser.add_argument("--ch", type=str, required=False)
+    parser.add_argument("--r", type=str, required=False)
+    parser.add_argument("--f", type=str, required=False)
+    parser.add_argument("--b", type=str, required=False)
+    parser.add_argument("--c", type=str, required=False)
+    parser.add_argument("--q", type=str, required=False)
     parser.add_argument("--country", type=str, required=False)
 
     args = parser.parse_args()
 
-    if args.ip != None and args.country==None:
-        traitement(args.ip)
-    if args.ip != None and args.country!=None:
-        setTime(args.ip, args.country)
+        ##GET ACTUAL CONFIGURATION
+    if args.ip != None and args.u != None and args.p!= None  and args.ch != None and args.r== None and args.f== None and args.b== None and args.c== None and args.q== None and args.country==None:
+       getCameraActualConfig(args.ip, args.u, args.p, args.ch)
+       
+       ##SET TIME
+    if args.ip != None and args.u != None and args.p!= None and args.country!=None:
+        setTime(args.ip, args.u, args.p, args.country)
+
+
+       ##SET CONFIGURATION
+    if args.ip != None and args.u != None and args.p!= None and args.ch != None:
+        traitement_camera(args.ip, args.u, args.p, args.ch, args.r, args.f, args.b, args.c, args.q)
+    
+      ##GET CAPACITIES
+    if args.ip != None and args.u != None and args.p!= None  and args.ch == None and args.r== None and args.f== None and args.b== None and args.c== None and args.q== None and args.country==None:
+       getCameraCapacities(args.ip, args.u, args.p)
