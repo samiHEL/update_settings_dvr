@@ -376,14 +376,14 @@ def get_country_time(country):
 
 # Get the current time in the local time zone
 def setTime(ip, username, password, country):
-
+    port = get_param(ip,username,password)
     auth = HTTPBasicAuth(username, password)
-    url_before = "http://"+ip+"/GetDateAndTime"
+    url_before = "http://"+str(ip)+':'+str(port)+"/GetDateAndTime"
     response_before = requests.get(url_before, auth=auth)
     print(response_before.text)
 
     local_now_string = get_country_time(country)
-    url_time = "http://"+ip+"/SetDateAndTime"
+    url_time = "http://"+str(ip)+':'+str(port)+"/SetDateAndTime"
 
     xml_data = '''
 <config version="1.0" xmlns="http://www.ipc.com/ver10">
@@ -407,7 +407,7 @@ def setTime(ip, username, password, country):
 </config>
 '''
     response_time = requests.post(url_time, auth=auth, data= xml_data)
-    url_after = "http://"+ip+"/GetDateAndTime"
+    url_after = "http://"+str(ip)+':'+str(port)+"/GetDateAndTime"
     response_after = requests.get(url_after, auth=auth)
     print('New configuration:')
     print(response_after.text)
