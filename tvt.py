@@ -49,7 +49,7 @@ def scan_ports(target_ip):
 
 def is_http_port(ip, username, password, port):
     url = f'http://www.google.com:{port}' 
-    url2 = "http://"+str(ip)+str(port)+"/GetChannelList"
+    url2 = "http://"+str(ip)+':'+str(port)+"/GetChannelList"
     print(url2)
     try:
         r = requests.get(url, stream=True, auth=HTTPBasicAuth(username, password), timeout=5)
@@ -156,7 +156,7 @@ auth = None
 def getNbCameras(ip, username, password):
     port = get_param(ip,username,password)
 
-    url = "http://"+str(ip)+str(port)+"/GetChannelList"
+    url = "http://"+str(ip)+':'+str(port)+"/GetChannelList"
     global auth
 
 
@@ -211,7 +211,7 @@ def getCameraActualConfig(ip,username, password, channels, caractere):
         total_cameras = getNbCameras(ip,username,password)
         if(channels == 'all_main'):
             for camera in range(int(total_cameras)):
-                url_actual_config =  "http://"+str(ip)+str(port)+"/GetVideoStreamConfig/"+str(camera)
+                url_actual_config =  "http://"+str(ip)+':'+str(port)+"/GetVideoStreamConfig/"+str(camera)
                 response_actual_config = requests.get(url_actual_config, auth=auth)
                 if response_actual_config.status_code == 200:
                     # Vérifier si la réponse contient des données
@@ -222,7 +222,7 @@ def getCameraActualConfig(ip,username, password, channels, caractere):
                 print('\n==========================================================\n')
         elif(channels == 'all_sub'):
             for camera in range(int(total_cameras)):
-                url_actual_config =  "http://"+str(ip)+str(port)+"/GetVideoStreamConfig/"+str(camera)
+                url_actual_config =  "http://"+str(ip)+':'+str(port)+"/GetVideoStreamConfig/"+str(camera)
                 response_actual_config = requests.get(url_actual_config, auth=auth)
                 if response_actual_config.status_code == 200:
                     # Vérifier si la réponse contient des données
@@ -233,7 +233,7 @@ def getCameraActualConfig(ip,username, password, channels, caractere):
                 print('\n==========================================================\n')
         
         else:
-                url_actual_config =  "http://"+str(ip)+str(port)+"/GetVideoStreamConfig/"+str(channels)
+                url_actual_config =  "http://"+str(ip)+':'+str(port)+"/GetVideoStreamConfig/"+str(channels)
                 response_actual_config = requests.get(url_actual_config, auth=auth)
                 if response_actual_config.status_code == 200:
                     # Vérifier si la réponse contient des données
@@ -252,7 +252,7 @@ def getCameraCapacities(ip, username, password):
 
     total_cameras = getNbCameras(ip, username, password)
     print('Voici ses capacités : \n')
-    url_capacities = "http://"+str(ip)+str(port)+"/GetStreamCaps/1"
+    url_capacities = "http://"+str(ip)+':'+str(port)+"/GetStreamCaps/1"
 
 
         # Effectuer la requête GET (ou POST, etc.) avec l'authentification
@@ -312,7 +312,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
         </config>'''
         print(xml_data)
         for camera in range(int(total_cameras)):
-            url_set_sub1 = "http://"+str(ip)+str(port)+"/SetVideoStreamConfig/"+str(camera)
+            url_set_sub1 = "http://"+str(ip)+':'+str(port)+"/SetVideoStreamConfig/"+str(camera)
 
             response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
         if response_set_sub1.status_code == 200:
@@ -349,7 +349,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
 
         print(xml_data)
 
-        url_set_sub1 = "http://"+str(ip)+str(port)+"/SetVideoStreamConfig/"+str(channels)
+        url_set_sub1 = "http://"+str(ip)+':'+str(port)+"/SetVideoStreamConfig/"+str(channels)
 
         response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
         if response_set_sub1.status_code == 200:
