@@ -190,7 +190,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
         if(fps!=None):
             xml_data += '''<frameRate type="uint32">'''+str(fps)+'''</frameRate>'''
 
-        if(bitrate!=''):
+        if(bitrate!=None):
             xml_data += '''<bitRateType type="bitRateType">'''+str(bitrate)+'''</bitRateType>'''
 
         if(compression!=None):
@@ -210,7 +210,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
 
             response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
         if response_set_sub1.status_code == 200:
-            print('Modification réussie pour la caméra \n'+str(camera))
+            print('Modification réussie pour la caméra '+str(camera))
     else:
         xml_data = '''
     <?xml version="1.0" encoding="UTF-8"?>
@@ -241,12 +241,12 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
 
         </config>'''
 
-        
+            
         url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(channels)
 
         response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
         if response_set_sub1.status_code == 200:
-            print('Modification réussie pour la caméra \n'+str(channels))
+            print('Modification réussie pour la caméra '+str(channels))
 
 
 
