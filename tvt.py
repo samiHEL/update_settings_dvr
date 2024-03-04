@@ -204,7 +204,7 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
                 </streams>
 
         </config>'''
-
+        print(xml_data)
         for camera in range(int(total_cameras)):
             url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(camera)
 
@@ -241,7 +241,8 @@ def traitement_camera(ip, username, password, channels, resolution, fps, bitrate
 
         </config>'''
 
-            
+        print(xml_data)
+
         url_set_sub1 = "http://"+ip+"/SetVideoStreamConfig/"+str(channels)
 
         response_set_sub1 = requests.post(url_set_sub1, auth=auth,data=xml_data)
