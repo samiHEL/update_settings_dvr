@@ -1,5 +1,5 @@
 import requests
-from requests.auth import HTTPBasicAuth
+from requests.auth import HTTPBasicAuth,HTTPDigestAuth
 import xml.etree.ElementTree as ET
 import sys
 import argparse
@@ -51,13 +51,13 @@ def is_http_port(camera_ip, username, password, port):
     url2 = f'http://{camera_ip}:{port}/GetChannelList'
     
     try:
-        r = requests.get(url, stream=True, auth=HTTPBasicAuth(username, password), timeout=5)
+        r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
         r.raise_for_status()
         print("test fonctionnel avec port  "+str(port))
         return True  # La connexion a réussi, donc c'est potentiellement un port HTTP
     except (requests.exceptions.RequestException):
         try:
-            r = requests.get(url2, stream=True, auth=HTTPBasicAuth(username, password), timeout=5)
+            r = requests.get(url2, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
             r.raise_for_status()
             print("test fonctionnel avec port  "+str(port))
             return True
@@ -97,8 +97,6 @@ def get_param(camera_ip, username, password):
         print("Aucun port HTTP potentiel trouvé.")
     return potential_http_ports[0]
   
-
-
 
 
 
