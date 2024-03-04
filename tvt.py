@@ -341,7 +341,7 @@ if __name__ == "__main__":
 
 
        ##SET CONFIGURATION
-    if args.ip != None and args.u != None and args.p!= None and args.ch != None:
+    if args.ip != None and args.u != None and args.p!= None and args.ch != None and (args.r != None or args.f != None or args.b != None or args.c != None or args.q != None):
         traitement_camera(args.ip, args.u, args.p, args.ch, args.r, args.f, args.b, args.c, args.q)
     
       ##GET CAPACITIES
