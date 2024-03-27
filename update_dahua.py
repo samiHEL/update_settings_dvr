@@ -134,15 +134,18 @@ def getinfoCam(camera_ip, username, password, channel_id,cam):
                         print("Unauthorized")
                     if r.status_code == 200:
                                     print("-----")
-                                    target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
-                                    compression_types = target_line_compression.split('=')[1].strip()
-                                    target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
-                                    resolution_types = target_line_resolution.split('=')[1].strip()
-                                    target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
-                                    fps_types = target_line_fps.split('=')[1].strip()
-                                    target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
-                                    bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                    print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                                    try:
+                                        target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.Compression' in line)
+                                        compression_types = target_line_compression.split('=')[1].strip()
+                                        target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.resolution' in line)
+                                        resolution_types = target_line_resolution.split('=')[1].strip()
+                                        target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.FPS' in line)
+                                        fps_types = target_line_fps.split('=')[1].strip()
+                                        target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
+                                        bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                                    except:
+                                          continue
                 if channel_id=="all_main":
                     sub = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode["+str(x)+"].MainFormat[0]"
                     r = requests.get(sub, stream=True, auth=HTTPDigestAuth(username, password)) 
@@ -151,15 +154,18 @@ def getinfoCam(camera_ip, username, password, channel_id,cam):
                           print("Unauthorized")
                     if r.status_code == 200:
                                     print("-----")
-                                    target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.Compression' in line)
-                                    compression_types = target_line_compression.split('=')[1].strip()
-                                    target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.resolution' in line)
-                                    resolution_types = target_line_resolution.split('=')[1].strip()
-                                    target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.FPS' in line)
-                                    fps_types = target_line_fps.split('=')[1].strip()
-                                    target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.BitRate' in line)
-                                    bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                    print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                                    try:
+                                        target_line_compression = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.Compression' in line)
+                                        compression_types = target_line_compression.split('=')[1].strip()
+                                        target_line_resolution = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.resolution' in line)
+                                        resolution_types = target_line_resolution.split('=')[1].strip()
+                                        target_line_fps = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.FPS' in line)
+                                        fps_types = target_line_fps.split('=')[1].strip()
+                                        target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.BitRate' in line)
+                                        bitrate_types = target_line_bitrate.split('=')[1].strip()
+                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                                    except:
+                                          continue
 def getAllSettings(camera_ip, username, password):
     number=numberCam(camera_ip, username, password)
     port=number[1]
