@@ -131,21 +131,27 @@ def extract_stream_data(xml_str, stream):
 
 def extract_stream_caps(xml_str, stream):
     root = ET.fromstring(xml_str)
+  
+    if stream == "main":
+        stream_id = "0"
+    else:
+        stream_id = "1"
+    
     # Find the resolutionCaps element
-    if(stream=="main"):
-        resolution_caps = root.find('.//{http://www.ipc.com/ver10}item[@id="0"]/{http://www.ipc.com/ver10}resolutionCaps')
-    else: 
-        resolution_caps = root.find('.//{http://www.ipc.com/ver10}item[@id="1"]/{http://www.ipc.com/ver10}resolutionCaps')
-
+    resolution_caps = root.find(f'.//{{http://www.ipc.com/ver10}}item[@id="{stream_id}"]/{{http://www.ipc.com/ver10}}resolutionCaps')
+    
     # Extract values of the item elements within resolutionCaps
-    resolutions = [item.text for item in resolution_caps.findall('.//{http://www.ipc.com/ver10}item')]
+    resolutions = []
+    max_framerates = []
+    for item in resolution_caps.findall('.//{http://www.ipc.com/ver10}item'):
+        resolutions.append(item.text)
+        max_framerates.append(item.get("maxFrameRate"))
 
-    # Print the extracted resolutions
-    print("Résolutions possibles:")
-    for resolution in resolutions:
-
-        print(resolution)
-
+    # Print the extracted resolutions and maxFrameRates
+    print("Résolutions possibles et maxFrameRates:")
+    for resolution, max_framerate in zip(resolutions, max_framerates):
+        max_framerate_divided = int(max_framerate) / 100  # Diviser le framerate par 100
+        print(f"Résolution: {resolution}, Max Frame Rate: {max_framerate_divided}")
 
 
 auth = None
