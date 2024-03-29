@@ -74,11 +74,12 @@ def print_results(compression_types,resolution_types,fps_types,bitrate_types):
     print('Resolution_types: ', resolution_types)
     print('Fps_types : ', fps_types)
     print('Bitrate_types: ', bitrate_types.replace(",","-"))
-def print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,channel):
+def print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,channel, bitratecontrol):
     print('channel : ', channel)
     print('Compression_types : ', compression_types)
     print('Resolution_types: ', resolution_types)
     print('Fps_types : ', fps_types)
+    print('bitrate control : ', bitratecontrol)
     print('Bitrate_types: ', bitrate_types.replace(",","-"))
 
 
@@ -143,7 +144,9 @@ def getinfoCam(camera_ip, username, password, channel_id,cam):
                                         fps_types = target_line_fps.split('=')[1].strip()
                                         target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRate' in line)
                                         bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                                        bitrate_control = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].ExtraFormat[0].Video.BitRateControl' in line)
+                                        bitrate_ctrl = bitrate_control.split('=')[1].strip()
+                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1),bitrate_ctrl)
                                     except:
                                           continue
                 if channel_id=="all_main":
@@ -163,7 +166,9 @@ def getinfoCam(camera_ip, username, password, channel_id,cam):
                                         fps_types = target_line_fps.split('=')[1].strip()
                                         target_line_bitrate = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.BitRate' in line)
                                         bitrate_types = target_line_bitrate.split('=')[1].strip()
-                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1))
+                                        bitrate_control = next(line for line in r.text.split('\n') if 'table.Encode['+str(x)+'].MainFormat[0].Video.BitRateControl' in line)
+                                        bitrate_ctrl = bitrate_control.split('=')[1].strip()
+                                        print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,str(x+1), bitrate_ctrl)
                                     except:
                                           continue
 def getAllSettings(camera_ip, username, password):
