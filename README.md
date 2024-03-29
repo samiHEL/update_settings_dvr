@@ -130,6 +130,59 @@ python3 axis.py --ip 10.151.214.51 --u root --p pass --r 768x576 --f 10 --c h.26
 --m (update ou create)
 
 
+# TVT
+
+### Exemple commande : 
+
+python3 tvt.py --ip 10.151.214.51 --u root --p pass 
+
+python3 tvt.py --ip 10.151.214.51 --u root --p pass --r 640x480 --f 5 --c h.264 --country fr
+
+
+### Parametres possibles : 
+
+--ip OBLIGATOIRE 
+
+--u OBLIGATOIRE 
+
+--p OBLIGATOIRE 
+
+--r (704x576 par exemple)
+
+--f (fps)
+
+--c (h.264)
+
+--country (pour modifier l'heure ex: fr/pt/us)
+
+# uniview
+
+### Exemple commande : 
+
+python3 update_uniview.py --ip 10.151.214.51 --u root --p pass 
+
+python3 update_univew.py --ip 10.151.214.51 --u root --p pass --r 640x480 --f 5 --c h.264
+
+
+### Parametres possibles : 
+
+--ip OBLIGATOIRE 
+
+--u OBLIGATOIRE 
+
+--p OBLIGATOIRE 
+
+--r (704x576 par exemple)
+
+--f (fps)
+
+--c (h.264)
+
+
+
+
+
+
 
 ## Ressources documentations APIs
 - **HIK**
