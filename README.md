@@ -70,7 +70,7 @@ Separer dernier elements adresse ip par des virgule et ne pas oublier les {}
 
 **Pour une cam ip :** python3 update_dahua.py --ip xxx --u admin --p Dahua123
 
-**Pour plusieurs cam ip :** python3 update_dahua.py --ip "xxx.{}" --u admin --p Dahua123
+**Pour plusieurs cam ip :** python3 update_dahua.py --ip "xxx.{}" --u admin --p Dahua123 --country pt
 
 ### Obtenir resolution actuel sur plusieurs cam IP :
 
@@ -98,6 +98,8 @@ python3 update_dahua.py --ip xxx --u admin --p Dahua123 **--ch (all_main, all_su
 --bc (CBR ou VBR)
 
 --m (false ou true) motion
+
+--country (fr, pt, us...) -> to change time
 
 **RAPPEL =** "XXX.XXX.XXX.{XXX,XXX,XXX}" quand cam ip
 
@@ -129,6 +131,7 @@ python3 axis.py --ip 10.151.214.51 --u root --p pass --r 768x576 --f 10 --c h.26
 
 --m (update ou create)
 
+--country (fr, pt, us...) -> to change time
 
 # TVT
 
