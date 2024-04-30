@@ -200,7 +200,7 @@ python3 update_univew.py --ip 10.151.214.51 --u root --p pass --r 640x480 --f 5 
 - **TVT**
   http://kamery.elnika.cz/update/tvt/RTSP_FW3.0_opened_telnet/3535NVR/20151222/TVTAPI1.4.pdf
 
-  - **UNIVIEW**
+- **UNIVIEW**
   [http://kamery.elnika.cz/update/tvt/RTSP_FW3.0_opened_telnet/3535NVR/20151222/TVTAPI1.4.pdf](https://www.xlrsecurity.com/wp-content/uploads/2023/10/LightAPI-InterFace-v3.00_EN-1.docx)
 
   
