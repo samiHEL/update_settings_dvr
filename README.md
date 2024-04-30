@@ -40,7 +40,7 @@ python3 update_hik.py --ip xxx --u admin --p Hikvision **--ch all_main OU all_su
 
 --encrypt (true ou false) (encryption)
 
-
+--country (fr, pt, us...) -> to change time
 
 
 # update_dahua
