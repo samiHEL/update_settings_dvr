@@ -1202,7 +1202,7 @@ if __name__ == "__main__":
                     set_compression(ip, args.u, args.p, args.ch, args.c,"yes")
                 if args.m!=None:
                     set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
-                if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                     get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
                 if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                     get_camera_parameters(ip, args.u, args.p, "all_main","yes")
@@ -1226,7 +1226,7 @@ if __name__ == "__main__":
             set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
         if args.encrypt!=None:
             encryption(args.ip, args.u, args.p, args.encrypt)
-        if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+        if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
         if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters(args.ip, args.u, args.p, "all_main","no")
