@@ -687,6 +687,22 @@ def setTime(camera_ip ,username, password, country):
     print(response_before.text)
 
 
+def reboot_dvr(camera_ip ,username, password):
+
+    number=numberCam(camera_ip, username, password)
+    port=number[1]
+
+    # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
+    auth = HTTPDigestAuth(username, password)
+
+    url_reboot = f"http://{camera_ip}:{port}/cgi-bin/magicBox.cgi?action=reboot"
+
+
+    response_reboot = requests.get(url_reboot, auth=auth, timeout=5)
+    if response_reboot.status_code == 200:
+        print('The device was successfully restarted.')
+
+
 
 
 
@@ -716,7 +732,7 @@ if __name__ == "__main__":
     parser.add_argument("--m", type=str, required=False)
     parser.add_argument("--bc", type=str, required=False)
     parser.add_argument("--country", type=str, required=False)
-
+    parser.add_argument("--reboot", type=str, required=False)
 
     args = parser.parse_args()
     if "{" in args.ip :
@@ -737,10 +753,12 @@ if __name__ == "__main__":
                 setBitrateControl(ip, args.u, args.p, args.ch,args.bc,"yes")  
             if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
                 getinfoCam(ip, args.u, args.p,args.ch,"yes")
-            if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+            if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None and args.reboot == None:
                 getAllSettings(ip, args.u, args.p)
             if args.country!=None:
                 setTime(ip, args.u, args.p, args.country)  
+            if args.u!=None and args.p!=None and ip!=None and args.reboot:
+                reboot_dvr(ip, args.u, args.p)
     else:
         if args.r!=None:
             setResolution(args.ip, args.u, args.p, args.ch, args.r,"no")
@@ -756,11 +774,13 @@ if __name__ == "__main__":
             setBitrateControl(args.ip, args.u, args.p, args.ch,args.bc,"no") 
         if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
             getinfoCam(args.ip, args.u, args.p,args.ch,"no")
-        if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
+        if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None and args.reboot == None:
             getAllSettings(args.ip, args.u, args.p)
         if args.country!=None:
             setTime(args.ip, args.u, args.p, args.country)
-        
+        if args.u!=None and args.p!=None and args.ip!=None and args.reboot:
+            reboot_dvr(args.ip, args.u, args.p)
+
 
 
 
