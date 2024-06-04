@@ -1204,6 +1204,9 @@ if __name__ == "__main__":
                     set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
                 if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                     get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
+                if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    get_camera_parameters(ip, args.u, args.p, "all_main","yes")
+                    get_camera_parameters(ip, args.u, args.p, "all_sub","yes")
                 if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                     get_camera_parameters_unique(ip, args.u, args.p)
                 if args.country!=None:
@@ -1225,6 +1228,9 @@ if __name__ == "__main__":
             encryption(args.ip, args.u, args.p, args.encrypt)
         if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
+        if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            get_camera_parameters(args.ip, args.u, args.p, "all_main","no")
+            get_camera_parameters(args.ip, args.u, args.p, "all_sub","no")
         if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
             get_camera_parameters_unique(args.ip, args.u, args.p)
         if args.country!=None:
