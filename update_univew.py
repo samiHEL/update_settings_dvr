@@ -174,6 +174,25 @@ def changeData(ip, username, password, channels, resolution, bitrate, framerate,
             print('Request failed with status code:', response.status_code)
 
 
+def reboot_dvr(ip, username, password):
+
+            # Define the URL, username, and password
+    url = 'http://'+ip+'/LAPI/V1.0/System/Reboot'
+    username = username
+    password = password
+
+    auth = HTTPDigestAuth(username,password)
+    response = requests.put(url, auth=auth)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Print the response content
+        print('The device was successfully restarted.')
+    else:
+        print('Error restaring the device.')
+
+
+
 def expand_ip_range(ip_range):
     ip_list = []
     match = re.match(r'^(\d+\.\d+\.\d+\.)\{([\d,]+)\}$', ip_range)
@@ -200,6 +219,8 @@ if __name__ == "__main__":
     parser.add_argument("--b", type=str, required=False)
     parser.add_argument("--c", type=str, required=False)
     parser.add_argument("--q", type=str, required=False)
+    parser.add_argument("--reboot", type=str, required=False)
+
 
     args = parser.parse_args()
 
@@ -207,24 +228,32 @@ if "{" in args.ip :
     ip_list = expand_ip_range(args.ip)
     for ip in ip_list:   
                 ##GET CAPACITIES
-        if args.ip != None and args.u != None and args.p!= None  and args.ch == None and args.r== None and args.f== None and args.b== None and args.c== None and args.q == None:
+        if args.ip != None and args.u != None and args.p!= None  and args.ch == None and args.r== None and args.f== None and args.b== None and args.c== None and args.q == None and args.reboot == None:
             getCaps(ip, args.u, args.p)
                 ##SET CONFIGURATION
         if (args.ip != None and args.u != None and args.p!= None  and args.ch != None) and (args.r!= None or args.b!= None or args.f!= None or args.bc!= None or args.q != None or args.c != None):
             changeData(ip, args.u, args.p, args.ch, args.r, args.b, args.f, args.bc, args.c, args.q)
                 ##GET ACTUAL CONFIGURATION
-        if(args.ip!=None and args.u != None and args.p!= None and args.ch != None):
+        if(args.ip!=None and args.u != None and args.p!= None and args.ch != None and args.reboot == None):
             getData(ip, args.u, args.p, args.ch)
+                ##Reboot DVR
+        if(args.ip!=None and args.u != None and args.p!= None and args.reboot != None):
+            reboot_dvr(ip, args.u, args.p)
+
+
 else:
             ##GET CAPACITIES
-    if args.ip != None and args.u != None and args.p!= None  and args.ch == None and args.r== None and args.f== None and args.b== None and args.c== None and args.q == None:
+    if args.ip != None and args.u != None and args.p!= None  and args.ch == None and args.r== None and args.f== None and args.b== None and args.c== None and args.q == None and args.reboot == None:
         getCaps(args.ip, args.u, args.p)
             ##SET CONFIGURATION
     if (args.ip != None and args.u != None and args.p!= None  and args.ch != None) and (args.r!= None or args.b!= None or args.f!= None or args.bc!= None or args.q != None or args.c != None):
         changeData(args.ip, args.u, args.p, args.ch, args.r, args.b, args.f, args.bc, args.c, args.q)
             ##GET ACTUAL CONFIGURATION
-    if(args.ip!=None and args.u != None and args.p!= None and args.ch != None):
+    if(args.ip!=None and args.u != None and args.p!= None and args.ch != None and args.reboot == None):
         getData(args.ip, args.u, args.p, args.ch)
+            ##Reboot DVR
+    if(args.ip!=None and args.u != None and args.p!= None and args.reboot != None):
+        reboot_dvr(args.ip, args.u, args.p)
 
         
 
