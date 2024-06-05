@@ -1143,6 +1143,13 @@ def setTime(camera_ip, username, password, country):
         else:
             print(f"Erreur : {response_get.status_code} - {response_get.text}")
 
+def reboot_dvr(camera_ip, username, password):
+    number=get_param(camera_ip, username, password)
+    port=number[1]
+    url_reboot = f'http://{camera_ip}:{port}/ISAPI/System/reboot'
+    response = requests.put(url_reboot, auth=HTTPDigestAuth(username, password))
+    if response.status_code == 200:
+        print('The device was successfully restarted.')
 
 
 
@@ -1186,6 +1193,7 @@ if __name__ == "__main__":
     parser.add_argument("--encrypt", type=str, required=False)
     parser.add_argument("--country", type=str, required=False)
     parser.add_argument("--app", type=str, required=False)
+    parser.add_argument("--reboot", type=str, required=False)
 
 
     args = parser.parse_args()
@@ -1208,17 +1216,20 @@ if __name__ == "__main__":
                         set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
                     if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                         get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
-                    if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                         get_camera_parameters(ip, args.u, args.p, "all_main","yes")
                         get_camera_parameters(ip, args.u, args.p, "all_sub","yes")
-                    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                         get_camera_parameters_unique(ip, args.u, args.p)
                     if args.country!=None:
                         setTime(ip, args.u, args.p, args.country)
                     if args.bc!=None:
                         set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
+                    if args.u!=None and args.p!=None and ip!=None and args.reboot:
+                        reboot_dvr(ip, args.u, args.p)
                     print("fin")
                     get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
+
                     
         else:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
@@ -1237,15 +1248,17 @@ if __name__ == "__main__":
                 encryption(args.ip, args.u, args.p, args.encrypt)
             if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                 get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
-            if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                 get_camera_parameters(args.ip, args.u, args.p, "all_main","no")
                 get_camera_parameters(args.ip, args.u, args.p, "all_sub","no")
-            if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                 get_camera_parameters_unique(args.ip, args.u, args.p)
             if args.country!=None:
                 encryption(args.ip, args.u, args.p, args.country)
             if args.bc!=None:
                 set_bitrateControl(args.ip, args.u, args.p, args.ch, args.bc, "no")
+            if args.u!=None and args.p!=None and args.ip!=None and args.reboot:
+                reboot_dvr(args.ip, args.u, args.p)
             print("fin")
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
     else:
@@ -1265,15 +1278,17 @@ if __name__ == "__main__":
                         set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
                     if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                         get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
-                    if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                         get_camera_parameters(ip, args.u, args.p, "all_main","yes")
                         get_camera_parameters(ip, args.u, args.p, "all_sub","yes")
-                    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                         get_camera_parameters_unique(ip, args.u, args.p)
                     if args.country!=None:
                         setTime(ip, args.u, args.p, args.country)
                     if args.bc!=None:
                         set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
+                    if args.u!=None and args.p!=None and ip!=None and args.reboot:
+                        reboot_dvr(ip, args.u, args.p)
         else:
             if args.r!=None:
                 set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
@@ -1289,15 +1304,17 @@ if __name__ == "__main__":
                 encryption(args.ip, args.u, args.p, args.encrypt)
             if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
                 get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
-            if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                 get_camera_parameters(args.ip, args.u, args.p, "all_main","no")
                 get_camera_parameters(args.ip, args.u, args.p, "all_sub","no")
-            if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+            if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None and args.reboot == None:
                 get_camera_parameters_unique(args.ip, args.u, args.p)
             if args.country!=None:
                 encryption(args.ip, args.u, args.p, args.country)
             if args.bc!=None:
                 set_bitrateControl(args.ip, args.u, args.p, args.ch, args.bc, "no")
+            if args.u!=None and args.p!=None and args.ip!=None and args.reboot:
+                reboot_dvr(args.ip, args.u, args.p)
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
