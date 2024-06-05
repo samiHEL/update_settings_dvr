@@ -42,6 +42,8 @@ python3 update_hik.py --ip xxx --u admin --p Hikvision **--ch all_main OU all_su
 
 --country (fr, pt, us...) -> to change time
 
+--reboot yes
+
 
 # update_dahua
 
@@ -100,6 +102,8 @@ python3 update_dahua.py --ip xxx --u admin --p Dahua123 **--ch (all_main, all_su
 --m (false ou true) motion
 
 --country (fr, pt, us...) -> to change time
+
+--reboot yes
 
 **RAPPEL =** "XXX.XXX.XXX.{XXX,XXX,XXX}" quand cam ip
 
