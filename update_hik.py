@@ -1185,52 +1185,119 @@ if __name__ == "__main__":
     parser.add_argument("--bc", type=str, required=False)
     parser.add_argument("--encrypt", type=str, required=False)
     parser.add_argument("--country", type=str, required=False)
+    parser.add_argument("--app", type=str, required=False)
 
 
     args = parser.parse_args()
-    if "{" in args.ip :
-        ip_list = expand_ip_range(args.ip)
-        print(ip_list)
-        for ip in ip_list:
-                if args.r!=None:
-                    set_resolution(ip, args.u, args.p, args.ch, args.r,"yes")
-                if args.f!=None:
-                    set_fps(ip, args.u, args.p, args.ch, args.f,"yes")
-                if args.b!=None:
-                    set_bitrate(ip, args.u, args.p, args.ch, args.b,"yes")
-                if args.c!=None:
-                    set_compression(ip, args.u, args.p, args.ch, args.c,"yes")
-                if args.m!=None:
-                    set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
-                if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+    if args.app=="yes":
+        if "{" in args.ip :
+            ip_list = expand_ip_range(args.ip)
+            print(ip_list)
+            for ip in ip_list:
                     get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
-                if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
-                    get_camera_parameters_unique(ip, args.u, args.p)
-                if args.country!=None:
-                    setTime(ip, args.u, args.p, args.country)
-                if args.bc!=None:
-                    set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
-    else:
-        if args.r!=None:
-            set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
-        if args.f!=None:
-            set_fps(args.ip, args.u, args.p, args.ch, args.f,"no")
-        if args.b!=None:
-            set_bitrate(args.ip, args.u, args.p, args.ch, args.b,"no")
-        if args.c!=None:
-            set_compression(args.ip, args.u, args.p, args.ch, args.c,"no")
-        if args.m!=None:
-            set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
-        if args.encrypt!=None:
-            encryption(args.ip, args.u, args.p, args.encrypt)
-        if args.ch!=None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                    print("debut")
+                    if args.r!=None:
+                        set_resolution(ip, args.u, args.p, args.ch, args.r,"yes")
+                    if args.f!=None:
+                        set_fps(ip, args.u, args.p, args.ch, args.f,"yes")
+                    if args.b!=None:
+                        set_bitrate(ip, args.u, args.p, args.ch, args.b,"yes")
+                    if args.c!=None:
+                        set_compression(ip, args.u, args.p, args.ch, args.c,"yes")
+                    if args.m!=None:
+                        set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
+                    if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                        get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
+                    if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                        get_camera_parameters(ip, args.u, args.p, "all_main","yes")
+                        get_camera_parameters(ip, args.u, args.p, "all_sub","yes")
+                    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                        get_camera_parameters_unique(ip, args.u, args.p)
+                    if args.country!=None:
+                        setTime(ip, args.u, args.p, args.country)
+                    if args.bc!=None:
+                        set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
+                    print("fin")
+                    get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
+                    
+        else:
             get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
-        if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
-            get_camera_parameters_unique(args.ip, args.u, args.p)
-        if args.country!=None:
-            encryption(args.ip, args.u, args.p, args.country)
-        if args.bc!=None:
-            set_bitrateControl(args.ip, args.u, args.p, args.ch, args.bc, "no")
+            print("debut")
+            if args.r!=None:
+                set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
+            if args.f!=None:
+                set_fps(args.ip, args.u, args.p, args.ch, args.f,"no")
+            if args.b!=None:
+                set_bitrate(args.ip, args.u, args.p, args.ch, args.b,"no")
+            if args.c!=None:
+                set_compression(args.ip, args.u, args.p, args.ch, args.c,"no")
+            if args.m!=None:
+                set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
+            if args.encrypt!=None:
+                encryption(args.ip, args.u, args.p, args.encrypt)
+            if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
+            if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                get_camera_parameters(args.ip, args.u, args.p, "all_main","no")
+                get_camera_parameters(args.ip, args.u, args.p, "all_sub","no")
+            if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                get_camera_parameters_unique(args.ip, args.u, args.p)
+            if args.country!=None:
+                encryption(args.ip, args.u, args.p, args.country)
+            if args.bc!=None:
+                set_bitrateControl(args.ip, args.u, args.p, args.ch, args.bc, "no")
+            print("fin")
+            get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
+    else:
+        if "{" in args.ip :
+            ip_list = expand_ip_range(args.ip)
+            print(ip_list)
+            for ip in ip_list:
+                    if args.r!=None:
+                        set_resolution(ip, args.u, args.p, args.ch, args.r,"yes")
+                    if args.f!=None:
+                        set_fps(ip, args.u, args.p, args.ch, args.f,"yes")
+                    if args.b!=None:
+                        set_bitrate(ip, args.u, args.p, args.ch, args.b,"yes")
+                    if args.c!=None:
+                        set_compression(ip, args.u, args.p, args.ch, args.c,"yes")
+                    if args.m!=None:
+                        set_motion(ip, args.u, args.p, args.ch, args.m,"yes")
+                    if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                        get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
+                    if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                        get_camera_parameters(ip, args.u, args.p, "all_main","yes")
+                        get_camera_parameters(ip, args.u, args.p, "all_sub","yes")
+                    if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                        get_camera_parameters_unique(ip, args.u, args.p)
+                    if args.country!=None:
+                        setTime(ip, args.u, args.p, args.country)
+                    if args.bc!=None:
+                        set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
+        else:
+            if args.r!=None:
+                set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
+            if args.f!=None:
+                set_fps(args.ip, args.u, args.p, args.ch, args.f,"no")
+            if args.b!=None:
+                set_bitrate(args.ip, args.u, args.p, args.ch, args.b,"no")
+            if args.c!=None:
+                set_compression(args.ip, args.u, args.p, args.ch, args.c,"no")
+            if args.m!=None:
+                set_motion(args.ip, args.u, args.p, args.ch, args.m,"no")
+            if args.encrypt!=None:
+                encryption(args.ip, args.u, args.p, args.encrypt)
+            if args.ch!=None and args.ch!="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
+            if args.ch=="all" and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                get_camera_parameters(args.ip, args.u, args.p, "all_main","no")
+                get_camera_parameters(args.ip, args.u, args.p, "all_sub","no")
+            if args.ch==None and args.r==None and args.f==None and args.b==None and args.c==None and args.m==None:
+                get_camera_parameters_unique(args.ip, args.u, args.p)
+            if args.country!=None:
+                encryption(args.ip, args.u, args.p, args.country)
+            if args.bc!=None:
+                set_bitrateControl(args.ip, args.u, args.p, args.ch, args.bc, "no")
 
 
 ## exemple commande Liste parametres flux primaire ou secondaire##
