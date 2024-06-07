@@ -78,159 +78,78 @@ def is_http_port(camera_ip, username, password, port):
             return False  # La connexion a échoué
         
    
-
-## MODIF RESOLUTION CAM FLUX PRIMAIRE OU SECONDAIRE
-def set_resolution(camera_ip, username, password, channel_id, resolution,cam):
-    resolution_width = resolution.split("x")[0]
-    resolution_height = resolution.split("x")[1]
-    number=get_param(camera_ip, username, password)
-    port=number[1]
-    nbCam=int(number[0])
+def set_resolution(camera_ip, username, password, channel_id, resolution, cam):
+    resolution_width, resolution_height = resolution.split("x")
+    number = get_param(camera_ip, username, password)
+    port = number[1]
+    nbCam = int(number[0])
     if cam == "yes":
         nbCam = 1
-    if "all"in channel_id:
-        for x in range(nbCam):
-            print(x+1)
-            if channel_id=="all_main":
-                channel=x+1
-                channel2=str(channel)+"01"
-            elif channel_id=="all_sub":
-                channel=x+1
-                channel2=str(channel)+"02"
-           
-            # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-            url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}'
-            #print(url_image_settings)
 
-            # Effectuer une requête HTTP GET
-            response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-            # Vérifier si la requête a réussi
-            if response_get.status_code == 200:
-                xml = response_get.text
-            else:
-                print(f"Erreur : {response_get.status_code} - {response_get.text}")
-
-            # Modifier la résolution
-
-            
-            # Modifier le fps
+    def modify_resolution(camera_index, stream_type):
+        channel = camera_index + 1
+        channel2 = f"{channel:02d}{stream_type}"
+        url_image_settings = f"http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}"
+        response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
+        
+        if response_get.status_code == 200:
+            xml = response_get.text
             xml = re.sub(r"<videoResolutionWidth>.*?</videoResolutionWidth>", f"<videoResolutionWidth>{resolution_width}</videoResolutionWidth>", xml)
             xml = re.sub(r"<videoResolutionHeight>.*?</videoResolutionHeight>", f"<videoResolutionHeight>{resolution_height}</videoResolutionHeight>", xml)
-
-            # Effectuer la requête HTTP PUT
-            response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-            # Vérifier si la requête a réussi
-            if response.status_code == 200:
-                print("Resolution pour camera "+str(channel2)+" mise à "+str(resolution)) 
+            response_put = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
+            
+            if response_put.status_code == 200:
+                print(f"Resolution pour camera {channel2} mise à {resolution}")
             else:
-                print(f"Erreur : {response.status_code} - {response.text}")
-    else:
-
-        resolution_width = resolution.split("x")[0]
-        resolution_height = resolution.split("x")[1]
-
-        # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-        url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel_id}'
-
-        # Effectuer une requête HTTP GET
-        response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-        # Vérifier si la requête a réussi
-        if response_get.status_code == 200:
-            xml = response_get.text
+                print(f"Erreur : {response_put.status_code} - {response_put.text}")
         else:
             print(f"Erreur : {response_get.status_code} - {response_get.text}")
 
-        # Modifier la résolution
+    if "all" in channel_id:
+        for x in range(nbCam):
+            print(x + 1)
+            if "main" in channel_id:
+                modify_resolution(x, "01")
+            elif "sub" in channel_id:
+                modify_resolution(x, "02")
+    else:
+        channel_index = int(channel_id) - 1
+        modify_resolution(channel_index, "02")
 
-        xml = re.sub(r"<videoResolutionWidth>.*?</videoResolutionWidth>", f"<videoResolutionWidth>{resolution_width}</videoResolutionWidth>", xml)
-        xml = re.sub(r"<videoResolutionHeight>.*?</videoResolutionHeight>", f"<videoResolutionHeight>{resolution_height}</videoResolutionHeight>", xml)
-        # Effectuer la requête HTTP PUT
-        response_put = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-        # Vérifier si la requête a réussi
-        if response_put.status_code == 200:
-            print("La résolution a été modifiée avec succès.")
-            #print(response_put.text)
-        else:
-            print(f"Erreur : {response_put.status_code} - {response_put.text}")
-
-
-## MODIF FPS CAM ##
-def set_fps(camera_ip, username, password, channel_id, fps,cam):
-    number=get_param(camera_ip, username, password)
-    port=number[1]
-    nbCam=int(number[0])
+def set_fps(camera_ip, username, password, channel_id, fps, cam):
+    number = get_param(camera_ip, username, password)
+    port = number[1]
+    nbCam = int(number[0])
     if cam == "yes":
         nbCam = 1
-    if "all"in channel_id:
-        
-        for x in range(nbCam):
-            print(x+1)
-            if channel_id=="all_main":
-                channel=x+1
-                channel2=str(channel)+"01"
-            elif channel_id=="all_sub":
-                channel=x+1
-                channel2=str(channel)+"02"
-            # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-            url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}'
-            #print(url_image_settings)
 
-            # Effectuer une requête HTTP GET
-            response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-            # Vérifier si la requête a réussi
-            if response_get.status_code == 200:
-                xml = response_get.text
-            else:
-                print(f"Erreur : {response_get.status_code} - {response_get.text}")
-
-            # Modifier la résolution
-
-            
-            # Modifier le fps
-            xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps*100}</maxFrameRate>", xml)
-
-            # Effectuer la requête HTTP PUT
-            response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-            # Vérifier si la requête a réussi
-            if response.status_code == 200:
-                print("Fps pour camera "+str(channel2)+" mise à "+str(fps)) 
-            else:
-                print(f"Erreur : {response.status_code} - {response.text}")
-    else:
-
-
-        # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
-        url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel_id}'
-
-        # Effectuer une requête HTTP GET
+    def modify_fps(camera_index, stream_type):
+        channel = camera_index + 1
+        channel2 = f"{channel:02d}{stream_type}"
+        url_image_settings = f"http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}"
         response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-        # Vérifier si la requête a réussi
+        
         if response_get.status_code == 200:
             xml = response_get.text
-            print(xml)
+            xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps * 100}</maxFrameRate>", xml)
+            response_put = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
+            
+            if response_put.status_code == 200:
+                print(f"Fps pour camera {channel2} mise à {fps}")
+            else:
+                print(f"Erreur : {response_put.status_code} - {response_put.text}")
         else:
             print(f"Erreur : {response_get.status_code} - {response_get.text}")
 
-        # Modifier la résolution
-
-        xml = re.sub(r"<maxFrameRate>.*?</maxFrameRate>", f"<maxFrameRate>{fps*100}</maxFrameRate>", xml)
-        # Effectuer la requête HTTP PUT
-        response_put = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-        # Vérifier si la requête a réussi
-        if response_put.status_code == 200:
-            print("Les fps ont été modifiée avec succès.")
-            #print(response_put.text)
-        else:
-            print(f"Erreur : {response_put.status_code} - {response_put.text}")
-
+    if "all" in channel_id.lower():
+        for x in range(nbCam):
+            print(x + 1)
+            if "main" in channel_id.lower():
+                modify_fps(x, "01")
+            elif "sub" in channel_id.lower():
+                modify_fps(x, "02")
+    else:
+        modify_fps(int(channel_id) - 1, "02")
 
 ## MODIF BITREATE CAM ##
 def set_bitrate(camera_ip, username, password, channel_id, BitRate,cam):
@@ -405,52 +324,27 @@ def set_compression(camera_ip, username, password, channel_id, compression,cam):
             elif channel_id=="all_sub":
                 channel=x+1
                 channel2=str(channel)+"02"
-            # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
             url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}'
-            #print(url_image_settings)
-
-            # Effectuer une requête HTTP GET
             response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-            # Vérifier si la requête a réussi
             if response_get.status_code == 200:
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-
-            # Modifier la résolution
-
             xml = re.sub(r"<videoCodecType>.*?</videoCodecType>", f"<videoCodecType>{compression}</videoCodecType>", xml)
-
-            # Effectuer la requête HTTP PUT
             response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-            # Vérifier si la requête a réussi
             if response.status_code == 200:
                 print("Compression pour camera "+str(channel2)+" mise à "+compression) 
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
     else:
-            # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
             url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel_id}'
-
-            # Effectuer une requête HTTP GET
             response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-            # Vérifier si la requête a réussi
             if response_get.status_code == 200:
                 xml = response_get.text
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-
-            # Modifier la résolution
-
             xml = re.sub(r"<videoCodecType>.*?</videoCodecType>", f"<videoCodecType>{compression}</videoCodecType>", xml)
-
-            # Effectuer la requête HTTP PUT
             response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-            # Vérifier si la requête a réussi
             if response.status_code == 200:
                 print("Compression pour camera "+str(channel_id)+" mise à "+compression) 
             else:
@@ -478,13 +372,9 @@ def get_camera_parameters(camera_ip, username, password, channel_id,cam):
             url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel2}/'
 
             try:
-                # Effectuer une requête HTTP GET avec une authentification basique
                 response = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-                # Vérifier si la requête a réussi (code d'état 200)
                 if response.status_code == 200:
                     xml = response.text
-                    #print(xml)
                     root = ET.fromstring(xml)
                     namespace_uri = root.tag.split('}', 1)[0][1:]
  
@@ -605,13 +495,9 @@ def get_camera_parameters(camera_ip, username, password, channel_id,cam):
             url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/{channel_id}/'
 
             try:
-                # Effectuer une requête HTTP GET avec une authentification basique
                 response = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-                # Vérifier si la requête a réussi (code d'état 200)
                 if response.status_code == 200:
                     xml = response.text
-                    #print(xml)
                     root = ET.fromstring(xml)
                     namespace_uri = root.tag.split('}', 1)[0][1:]
 
@@ -737,7 +623,6 @@ def encryption(camera_ip, username, password, param):
     #reponse -> <isSupportStreamingEncrypt>true</isSupportStreamingEncrypt>
     response = requests.get(url, auth=HTTPDigestAuth(username, password))
 
-    # Vérifier si la requête a réussi
     if response.status_code == 200:
         xml = response.text
         print("--------------- PARAMETRE AVANT CHANGEMENT ---------------" )
@@ -746,16 +631,12 @@ def encryption(camera_ip, username, password, param):
     else:
         print(f"Erreur : {response.status_code} - {response.text}")
         return
-    # Modifier la résolution
     if param.lower() =="true":
         xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>true</enabled>", xml)
     else:
         xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>false</enabled>", xml)
 
-    # Effectuer la requête HTTP PUT
     response = requests.put(url, auth=HTTPDigestAuth(username, password), data=xml)
-
-    # Vérifier si la requête a réussi
     if response.status_code == 200:
         print(response.status_code)
         print("--------------- PARAMETRE APRES CHANGEMENT ---------------")
@@ -775,7 +656,6 @@ def get_camera_parameters_unique(camera_ip, username, password):
     response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
 
 
-    # Vérifier si la requête a réussi
     if response_get.status_code == 200:
         xml = response_get.text
         print(xml)
@@ -784,14 +664,10 @@ def get_camera_parameters_unique(camera_ip, username, password):
     tab=[[url_image_settings_main,"primaire"],[url_image_settings_sub,"secondaire"]]
     for t in tab:
         try:
-            # Effectuer une requête HTTP GET avec une authentification basique
             response = requests.get(t[0], auth=HTTPDigestAuth(username, password))
-
-            # Vérifier si la requête a réussi (code d'état 200)
             if response.status_code == 200:
 
                 xml = response.text
-                #print(xml)
                 root = ET.fromstring(xml)
                 namespace_uri = root.tag.split('}', 1)[0][1:]
                 if namespace_uri in ns['ns'] :
@@ -862,10 +738,7 @@ def get_camera_parameters_unique(camera_ip, username, password):
 
                     maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns3)
                     maxFrameRate_opt = maxFrameRate.attrib['opt']
-                    # Diviser la chaîne en une liste de chaînes
                     string_list = maxFrameRate_opt.split(',')
-
-                    # Convertir chaque élément de la liste en entier
                     int_list = [int(x) for x in string_list]
                     maxFrameRate_opt_list = [x / 100 for x in int_list]
                     maxFrameRate_opt_list.pop(0)
@@ -946,10 +819,7 @@ def get_camera_parameters_unique(camera_ip, username, password):
 
                     maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns6)
                     maxFrameRate_opt = maxFrameRate.attrib['opt']
-                    # Diviser la chaîne en une liste de chaînes
                     string_list = maxFrameRate_opt.split(',')
-
-                    # Convertir chaque élément de la liste en entier
                     int_list = [int(x) for x in string_list]
                     maxFrameRate_opt_list = [x / 100 for x in int_list]
                     maxFrameRate_opt_list.pop(0)
@@ -971,48 +841,27 @@ def get_param(camera_ip, username, password):
     open_ports=scan_ports(camera_ip)
     print(open_ports)
     potential_http_ports = []
-
-
     for port in open_ports:
         try:
             if is_http_port(camera_ip, username, password, port):
                 potential_http_ports.append(port)
-                break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
+                break 
         except:
             print(f"L'itération pour le port {port} a pris trop de temps (plus de 30 secondes).")
-            # Ajoutez ici un code pour gérer le dépassement du temps, si nécessaire
-
-    # for port in open_ports:
-    #     if is_http_port(camera_ip, username, password, port):
-    #         potential_http_ports.append(port)
-    #         break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
-
-    #potential_http_ports = [port for port in open_ports if is_http_port(camera_ip, username, password, port)]
-
     if potential_http_ports:
         print(f"Le ports HTTP potentiel est: {potential_http_ports[0]}")
     else:
         print("Aucun port HTTP potentiel trouvé.")
-    # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
     url_image_settings = f'http://{camera_ip}:{port}/ISAPI/System/Video/inputs/channels/'
-    #url_image_settings = f'http://{camera_ip}/ISAPI/System/Video/inputs/channels/2/MotionDetection'
-    
-
-    # Effectuer une requête HTTP GET
     response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-    # Vérifier si la requête a réussi
     if response_get.status_code == 200:
         xml = response_get.text
-        
         namespace = {'ns': 'http://www.hikvision.com/ver20/XMLSchema'}
         root = ET.fromstring(xml)
-        # Utiliser re.search pour extraire la valeur de inputPort pour le dernier VideoInputChannel
         match = re.search(r"<inputPort>(\d+)</inputPort>(?:(?!<inputPort>).)*$", xml, re.DOTALL)
         
         if match:
             valeur_input_port = match.group(1)
-            #print("Valeur de inputPort pour le dernier VideoInputChannel :", valeur_input_port)
             return [valeur_input_port,port]
         else:
             print("Balise inputPort non trouvée dans le dernier VideoInputChannel.")
@@ -1026,9 +875,7 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
     nbCam=int(number[0])
     if cam == "yes":
         nbCam = 1
-    # Exemple d'URL pour accéder aux paramètres d'image (à adapter en fonction de votre caméra)
     if "all" in channel_id:
-       
         for x in range(nbCam):
             print(x+1)
             if channel_id=="all_main":
@@ -1036,28 +883,16 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
             elif channel_id=="all_sub":
                 channel2=x+1
             url_image_settings = f'http://{camera_ip}:{port}/ISAPI/System/Video/inputs/channels/{channel2}/MotionDetection'
-
-            # Effectuer une requête HTTP GET
             response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-            # Vérifier si la requête a réussi
             if response_get.status_code == 200:
                 xml = response_get.text
                 print(xml)
                 print("------------------------------")
             else:
                 print(f"Erreur : {response_get.status_code} - {response_get.text}")
-
-            # Modifier la résolution
-
             xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>{motionDetect.lower()}</enabled>", xml)
-
-            # Effectuer la requête HTTP PUT
             response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-            # Vérifier si la requête a réussi
             if response.status_code == 200:
-                #print(response.text)
                 print("Detection mouvement pour camera "+str(channel_id)+" mise à "+motionDetect.lower()) 
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
@@ -1065,31 +900,17 @@ def set_motion(camera_ip, username, password, channel_id, motionDetect,cam):
                 set_motion(camera_ip, username, password, channel_id, motionDetect)
     else:
         url_image_settings = f'http://{camera_ip}:{port}/ISAPI/System/Video/inputs/channels/{channel_id}/MotionDetection'
-
-        # Effectuer une requête HTTP GET
         response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
-
-        # Vérifier si la requête a réussi
         if response_get.status_code == 200:
             xml = response_get.text
         else:
             print(f"Erreur : {response_get.status_code} - {response_get.text}")
-
-        # Modifier la résolution
-
         xml = re.sub(r"<enabled>.*?</enabled>", f"<enabled>{motionDetect.lower()}</enabled>", xml)
-
-        # Effectuer la requête HTTP PUT
         response = requests.put(url_image_settings, auth=HTTPDigestAuth(username, password), data=xml)
-
-        # Vérifier si la requête a réussi
         if response.status_code == 200:
-            #print(response.text)
             print("Detection mouvement pour camera "+str(channel_id)+" mise à "+motionDetect.lower()) 
         else:
             print(f"Erreur : {response.status_code} - {response.text}")
-
-
 
 def get_country_time(pays):
     try:
@@ -1115,8 +936,6 @@ def setTime(camera_ip, username, password, country):
         if response_get.status_code == 200:
             xml = response_get.text
             root = ET.fromstring(xml)
-
-            # Find the <localTime> element and retrieve its text content
             local_time_element = root.find('.//{http://www.std-cgi.com/ver20/XMLSchema}localTime')
             local_time_content = local_time_element.text
             print('Time before change :')
@@ -1150,14 +969,6 @@ def reboot_dvr(camera_ip, username, password):
     response = requests.put(url_reboot, auth=HTTPDigestAuth(username, password))
     if response.status_code == 200:
         print('The device was successfully restarted.')
-
-
-
-
-
-
-
-
 
 def print_results(id_channel, width_resolution, height_resolution, type_bande_passante, image_par_sec, debit_bin_max, encodage_video):
     print('ID Channel :', id_channel)
@@ -1323,5 +1134,3 @@ if __name__ == "__main__":
 ## exemple commande PUT parametres flux primaire ou secondaire##
 ##python3 update_settings_dvr.py --camera_ip 172.24.1.105 --username admin --password Hikvision --channel_id 102 --resolution 960x576
 
-#Cryptage du flux de caméra HIK
-#supp analyse mouvement HIK DAHUA
