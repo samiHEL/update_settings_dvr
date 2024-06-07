@@ -54,19 +54,27 @@ def is_http_port(camera_ip, username, password, port):
 
 def numberCam(camera_ip, username, password):
     open_ports = scan_ports(camera_ip)
-    potential_http_ports = [port for port in open_ports if is_http_port(camera_ip, username, password, port)]
-    port = potential_http_ports[0] if potential_http_ports else None
-    if not port:
-        print("Aucun port HTTP potentiel trouvé.")
-        return [1, None]
-    url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
-    r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
-    matches = re.findall(r'table\.Ptz\[(\d+)\]', r.text)
-    if matches:
-        return [int(matches[-1]) + 1, port]
-    else:
-        print("nombre de camera introuvable")
-        return [1, port]
+    for port in open_ports:
+        if is_http_port(camera_ip, username, password, port):
+            url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
+            r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
+            matches = re.findall(r'table\.Ptz\[(\d+)\]', r.text)
+            if matches:
+                return [int(matches[-1]) + 1, port]
+            else:
+                print("nombre de camera introuvable")
+                return [1, port]
+    print("Aucun port HTTP potentiel trouvé.")
+    return [1, None]
+
+
+def print_results_cam(compression_types, resolution_types, fps_types, bitrate_types, channel, bitratecontrol):
+    print(f'channel : {channel}')
+    print(f'Compression_types : {compression_types}')
+    print(f'Resolution_types: {resolution_types}')
+    print(f'Fps_types : {fps_types}')
+    print(f'bitrate control : {bitratecontrol}')
+    print(f'Bitrate_types: {bitrate_types.replace(",", "-")}')
 
 
 def fetch_camera_config(camera_ip, username, password, channel_id, format_type, cam):
@@ -80,9 +88,18 @@ def fetch_camera_config(camera_ip, username, password, channel_id, format_type, 
         r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
         if r.status_code == 200:
             try:
-                results = {line.split('=')[0]: line.split('=')[1].strip() for line in r.text.split('\n') if line}
-                print(results)
-            except:
+                target_line_compression = next(line for line in r.text.split('\n') if f'table.Encode[{x}].{format_type}[0].Video.Compression' in line)
+                compression_types = target_line_compression.split('=')[1].strip()
+                target_line_resolution = next(line for line in r.text.split('\n') if f'table.Encode[{x}].{format_type}[0].Video.resolution' in line)
+                resolution_types = target_line_resolution.split('=')[1].strip()
+                target_line_fps = next(line for line in r.text.split('\n') if f'table.Encode[{x}].{format_type}[0].Video.FPS' in line)
+                fps_types = target_line_fps.split('=')[1].strip()
+                target_line_bitrate = next(line for line in r.text.split('\n') if f'table.Encode[{x}].{format_type}[0].Video.BitRate' in line)
+                bitrate_types = target_line_bitrate.split('=')[1].strip()
+                bitrate_control = next(line for line in r.text.split('\n') if f'table.Encode[{x}].{format_type}[0].Video.BitRateControl' in line)
+                bitrate_ctrl = bitrate_control.split('=')[1].strip()
+                print_results_cam(compression_types, resolution_types, fps_types, bitrate_types, str(x + 1), bitrate_ctrl)
+            except StopIteration:
                 continue
 
 
