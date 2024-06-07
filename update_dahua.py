@@ -355,7 +355,6 @@ def setBitrate(camera_ip, username, password, channel_id, bitrate,cam):
                 else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
                     
-            
             elif channel_id.lower()=="all_main":   
                 bitrate_cam=f"Encode[{x}].MainFormat[0].Video.BitRate"
                 url_bitrate = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{bitrate_cam}={bitrate}"
@@ -608,16 +607,11 @@ def setTime(camera_ip ,username, password, country):
     response_before = requests.get(url_before, auth=auth, timeout=5)
     print('Time before change :')
     print(response_before.text)
-    
-  
     local_now_string = get_country_time(country)
-
     url_time = f"http://{camera_ip}:{port}/cgi-bin/global.cgi?action=setCurrentTime&time="+local_now_string
     response_time = requests.post(url_time, auth=auth, timeout=5)
     if response_time.status_code == 200:
         print('Time change successful!')
-
-
     response_before = requests.get(url_before, auth=auth, timeout=5)
     print('New Time :')
     print(response_before.text)
@@ -627,21 +621,12 @@ def reboot_dvr(camera_ip ,username, password):
 
     number=numberCam(camera_ip, username, password)
     port=number[1]
-
     # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
     auth = HTTPDigestAuth(username, password)
-
     url_reboot = f"http://{camera_ip}:{port}/cgi-bin/magicBox.cgi?action=reboot"
-
-
     response_reboot = requests.get(url_reboot, auth=auth, timeout=5)
     if response_reboot.status_code == 200:
         print('The device was successfully restarted.')
-
-
-
-
-
 
 
 #getinfoCam()
@@ -708,11 +693,6 @@ if __name__ == "__main__":
             setTime(args.ip, args.u, args.p, args.country)
         if args.u!=None and args.p!=None and args.ip!=None and args.reboot:
             reboot_dvr(args.ip, args.u, args.p)
-
-
-
-
-
 
 #ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
 ##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
