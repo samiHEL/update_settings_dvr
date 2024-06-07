@@ -212,123 +212,78 @@ def getAllSettings(camera_ip, username, password):
         extract_and_print_params(r.text, 'MainFormat[0]')
         extract_and_print_params(r.text, 'ExtraFormat[0]')
 
-def setResolution(camera_ip, username, password, channel_id,resolution,cam):
-    number=numberCam(camera_ip, username, password)
-    port=number[1]
-    nbCam=int(number[0])
+def setResolution(camera_ip, username, password, channel_id, resolution, cam):
+    number = numberCam(camera_ip, username, password)
+    port = number[1]
+    nbCam = int(number[0])
     if cam == "yes":
         nbCam = 1
-    if "all" in channel_id:
-        for x in range(nbCam):
-            print(x+1)
 
-            if channel_id.lower()=="all_sub":   
-                resolution_com=f"Encode[{x}].ExtraFormat[0].Video.resolution"
-                resolution_com=f"Encode["+str(x)+"].ExtraFormat[0].Video.resolution"
-                url_resolution = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
-                r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password)) 
-                if r.status_code == 200:
-                                print("Resolution pour camera "+str(x+1)+" mise à "+str(resolution))
-                elif r.status_code == 400:
-                    
-                    url_resolution = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}=704x576"
-                    r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password))
-                    print(str(resolution)+" Resolution trop haute DONC resolution mise à 704x576 automatiquement !")
-                else : 
-                    if r.status_code==401:
-                        print("Unauthorized")
-                    else:
-                        print(f"Erreur : {r.status_code} - {r.text}")
-
-                    
-            
-            elif channel_id.lower()=="all_main":   
-                resolution_com=f"Encode[{x}].MainFormat[0].Video.resolution"
-                url_resolution = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
-                print(url_resolution)
-                r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password)) 
-                print(r.status_code)
-                if r.status_code==401:
-                    print("Unauthorized")
-                if r.status_code == 200:
-                                print("Resolution pour camera "+str(x+1)+" mise à "+str(resolution))
-                elif r.status_code == 400:
-                    print("Pas bon format !")
-                else : 
-                    print(f"Erreur : {r.status_code} - {r.text}")
-    else:
-            channel_id=int(channel_id)-1
-            resolution_com=f"Encode[{channel_id}].ExtraFormat[0].Video.resolution"
-            url_resolution = f"http://{channel_id}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
-            print(url_resolution)
-            r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password)) 
-            print(r.status_code)
-            if r.status_code==401:
-                    print("Unauthorized")
+    def set_resolution_for_camera(camera_index, format_type):
+        resolution_com = f"Encode[{camera_index}].{format_type}.Video.resolution"
+        url_resolution = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}={resolution}"
+        r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password))
+        print(r.status_code)
+        if r.status_code == 401:
+            print("Unauthorized")
+        elif r.status_code == 200:
+            print(f"Resolution pour camera {camera_index + 1} mise à {resolution}")
+        elif r.status_code == 400 and format_type == "ExtraFormat[0]":
+            print(f"Resolution trop haute pour camera {camera_index + 1}, mise à 704x576")
+            url_resolution = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{resolution_com}=704x576"
+            r = requests.put(url_resolution, stream=True, auth=HTTPDigestAuth(username, password))
             if r.status_code == 200:
-                            print("Resolution pour camera "+str(channel_id)+" mise à "+str(resolution)) 
-            elif r.status_code == 400:
-                    print("Pas bon format !")
-            else : 
-                    print(f"Erreur : {r.status_code} - {r.text}")
+                print(f"Resolution pour camera {camera_index + 1} mise à 704x576")
+            else:
+                print(f"Erreur : {r.status_code} - {r.text}")
+        else:
+            print(f"Erreur : {r.status_code} - {r.text}")
+
+    if "all" in channel_id.lower():
+        for x in range(nbCam):
+            print(x + 1)
+            if "sub" in channel_id.lower():
+                set_resolution_for_camera(x, "ExtraFormat[0]")
+            elif "main" in channel_id.lower():
+                set_resolution_for_camera(x, "MainFormat[0]")
+    else:
+        channel_index = int(channel_id) - 1
+        set_resolution_for_camera(channel_index, "ExtraFormat[0]")
+
       
     
-def setFps(camera_ip, username, password, channel_id, fps,cam):
-    number=numberCam(camera_ip, username, password)
-    port=number[1]
-    nbCam=int(number[0])
+def setFps(camera_ip, username, password, channel_id, fps, cam):
+    number = numberCam(camera_ip, username, password)
+    port = number[1]
+    nbCam = int(number[0])
     if cam == "yes":
         nbCam = 1
-    if "all" in channel_id:
+
+    def set_fps_for_camera(camera_index, format_type):
+        fps_cam = f"Encode[{camera_index}].{format_type}.Video.FPS"
+        url_fps = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
+        r = requests.put(url_fps, stream=True, auth=HTTPDigestAuth(username, password))
+        print(r.status_code)
+        if r.status_code == 401:
+            print("Unauthorized")
+        elif r.status_code == 200:
+            print(f"FPS pour camera {camera_index + 1} mise à {fps}")
+        elif r.status_code == 400:
+            print("Pas bon format !")
+        else:
+            print(f"Erreur : {r.status_code} - {r.text}")
+
+    if "all" in channel_id.lower():
         for x in range(nbCam):
-            print(x+1)
-
-            if channel_id.lower()=="all_sub":   
-                fps_cam=f"Encode[{x}].ExtraFormat[0].Video.FPS"
-                fps_cam=f"Encode["+str(x)+"].ExtraFormat[0].Video.FPS"
-
-                url_fps = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
-                r = requests.put(url_fps, stream=True, auth=HTTPDigestAuth(username, password)) 
-                print(r.status_code)
-                if r.status_code==401:
-                    print("Unauthorized")
-                if r.status_code == 200:
-                                print("FPS pour camera "+str(x+1)+" mise à "+str(fps))
-                elif r.status_code == 400:
-                    print("Pas bon format !")
-                else : 
-                    print(f"Erreur : {r.status_code} - {r.text}")
-                    
-            
-            elif channel_id.lower()=="all_main":   
-                fps_cam=f"Encode[{x}].MainFormat[0].Video.FPS"
-                url_fps = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
-                print(url_fps)
-                r = requests.put(url_fps, stream=True, auth=HTTPDigestAuth(username, password)) 
-                print(r.status_code)
-                if r.status_code==401:
-                    print("Unauthorized")
-                if r.status_code == 200:
-                                print("FPS pour camera "+str(x+1)+" mise à "+str(fps))
-                elif r.status_code == 400:
-                    print("Pas bon format !")
-                else : 
-                    print(f"Erreur : {r.status_code} - {r.text}")
+            print(x + 1)
+            if "sub" in channel_id.lower():
+                set_fps_for_camera(x, "ExtraFormat[0]")
+            elif "main" in channel_id.lower():
+                set_fps_for_camera(x, "MainFormat[0]")
     else:
-            channel_id=int(channel_id)-1
-            fps_cam=f"Encode[{channel_id}].ExtraFormat[0].Video.FPS"
-            url_fps = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&{fps_cam}={fps}"
-            print(url_fps)
-            r = requests.put(url_fps, stream=True, auth=HTTPDigestAuth(username, password)) 
-            print(r.status_code)
-            if r.status_code==401:
-                    print("Unauthorized")
-            if r.status_code == 200:
-                            print("FPS pour camera "+str(channel_id)+" mise à "+str(fps)) 
-            elif r.status_code == 400:
-                    print("Pas bon format !")
-            else : 
-                    print(f"Erreur : {r.status_code} - {r.text}")
+        channel_index = int(channel_id) - 1
+        set_fps_for_camera(channel_index, "ExtraFormat[0]")
+
 
 
 def setBitrate(camera_ip, username, password, channel_id, bitrate,cam):
@@ -502,73 +457,40 @@ def setBitrateControl(camera_ip, username, password, channel_id, Bcontrole,cam):
                     print("Pas bon format !")
             else : 
                     print(f"Erreur : {r.status_code} - {r.text}")
-def setEncryption(camera_ip, username, password):
-    url_encrypt = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.eth2.Encryption=On"
-    #url_encrypt = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=getConfig&name=WLan"
-    r = requests.put(url_encrypt, stream=True, auth=HTTPDigestAuth(username, password))
-    #r = requests.put(url_compression_main, stream=True, auth=HTTPDigestAuth(username, password))
-    print(r.status_code)
-    if r.status_code==401:
-                    print("Unauthorized")
-    if r.status_code == 200:
-                    print(r.text) 
-def setDetection(camera_ip, username, password,channel_id,motionDetect,cam):
-    channel_id=int(channel_id)-1
-    channel_str=channel_id+1
-    url_detection=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{channel_id}].Enable={motionDetect.lower()}"
-    #print(url_detection)
-    r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
-    print(r.status_code)
-    if r.status_code==401:
-                    print("Unauthorized")
-    if r.status_code == 200:
-        number=numberCam(camera_ip, username, password)
-        port=number[1]
-        nbCam=int(number[0])
-        if cam == "yes":
-            nbCam = 1
-        if "all" in channel_id:
-            for x in range(nbCam):
-                print(x+1)
+def setDetection(camera_ip, username, password, channel_id, motionDetect, cam):
+    motionDetect = motionDetect.lower()
+    number = numberCam(camera_ip, username, password)
+    port = number[1]
+    nbCam = int(number[0])
+    if cam == "yes":
+        nbCam = 1
 
-                if channel_id.lower()=="all_sub" or channel_id.lower()=="all_main":   
-
-                    url_detection=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{x}].Enable={motionDetect.lower()}"
-                    #print(url_detection)
-                    r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
-                    print(r.status_code)
-                    if r.status_code==401:
-                        print("Unauthorized")
-                    if r.status_code == 200:
-                        print(r.text)
-                        print("Detection mouvement pour camera "+str(channel_str)+" mise à "+motionDetect.lower()) 
-                        print("Detection mouvement pour camera "+str(x+1)+" mise à "+motionDetect.lower()) 
-                    elif r.status_code == 400:
-                        print("Pas bon format !")
-                    else : 
-                        print(f"Erreur : {r.status_code} - {r.text}")
-
+    def set_motion_detection(camera_index):
+        url_detection = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{camera_index}].Enable={motionDetect}"
+        r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
+        print(r.status_code)
+        if r.status_code == 401:
+            print("Unauthorized")
+        elif r.status_code == 200:
+            print(f"Detection mouvement pour camera {camera_index + 1} mise à {motionDetect}")
+        elif r.status_code == 400:
+            print("Pas bon format !")
         else:
-                channel_id=int(channel_id)-1
-                channel_str=channel_id+1
-                url_detection=f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=setConfig&MotionDetect[{channel_id}].Enable={motionDetect.lower()}"
-                r = requests.put(url_detection, stream=True, auth=HTTPDigestAuth(username, password))
-                print(r.status_code)
-                if r.status_code==401:
-                    print("Unauthorized")
-                if r.status_code == 200:
-                    print(r.text)
-                    print("Detection mouvement pour camera "+str(channel_str)+" mise à "+motionDetect.lower()) 
-                elif r.status_code == 400:
-                    print("Pas bon format !")
-                else : 
-                    print(f"Erreur : {r.status_code} - {r.text}")
+            print(f"Erreur : {r.status_code} - {r.text}")
+
+    if "all" in channel_id:
+        for x in range(nbCam):
+            set_motion_detection(x)
+    else:
+        channel_index = int(channel_id) - 1
+        set_motion_detection(channel_index)
+
 def setEncrypt(camera_ip, username, password):
     url_encrypt=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.Enable=true"
     url_encrypt2=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.KeyFlag=true"
     url_encrypt3=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.wlan0.Encryption=On"
     url_encrypt4=f"http://{camera_ip}/cgi-bin/configManager.cgi?action=getConfig&name=WLan"
-    #print(url_detection)
+    url_encrypt5 = f"http://{camera_ip}/cgi-bin/configManager.cgi?action=setConfig&WLan.eth2.Encryption=On"
     r = requests.put(url_encrypt, stream=True, auth=HTTPDigestAuth(username, password))
     r2 = requests.put(url_encrypt2, stream=True, auth=HTTPDigestAuth(username, password))
     r3 = requests.put(url_encrypt3, stream=True, auth=HTTPDigestAuth(username, password))
@@ -576,7 +498,7 @@ def setEncrypt(camera_ip, username, password):
     print(r4.status_code)
     if r4.status_code == 200:
                     
-                    print(r4.text)
+        print(r4.text)
 
 def get_country_time(pays):
     try:
@@ -587,22 +509,17 @@ def get_country_time(pays):
             country_time = datetime.now(pytz.timezone(country_timezone[0]))
             country_time_formatted = country_time.strftime("%Y-%m-%d%%20%H:%M:%S")
             return country_time_formatted
-
         else:
             return f"Impossible de trouver le fuseau horaire pour le pays avec le code {'GB'}."
     except Exception as e:
         print("Une erreur s'est produite lors de la récupération de l'heure du pays :", e)
         return None
 
-
 def setTime(camera_ip ,username, password, country):
 
     number=numberCam(camera_ip, username, password)
     port=number[1]
-
-    # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
     auth = HTTPDigestAuth(username, password)
-
     url_before = f"http://{camera_ip}:{port}/cgi-bin/global.cgi?action=getCurrentTime"
     response_before = requests.get(url_before, auth=auth, timeout=5)
     print('Time before change :')
@@ -621,16 +538,12 @@ def reboot_dvr(camera_ip ,username, password):
 
     number=numberCam(camera_ip, username, password)
     port=number[1]
-    # Création de l'en-tête d'autorisation en utilisant HTTPBasicAuth
     auth = HTTPDigestAuth(username, password)
     url_reboot = f"http://{camera_ip}:{port}/cgi-bin/magicBox.cgi?action=reboot"
     response_reboot = requests.get(url_reboot, auth=auth, timeout=5)
     if response_reboot.status_code == 200:
         print('The device was successfully restarted.')
 
-
-#getinfoCam()
-#setCompression("172.24.14.23","admin","Veesion2023!",8,"H.264")
 def execute_actions(ip, args, cam):
     if args.r:
         setResolution(ip, args.u, args.p, args.ch, args.r, cam)
@@ -672,6 +585,7 @@ if __name__ == "__main__":
     ip_list = expand_ip_range(args.ip) if "{" in args.ip else [args.ip]
     for ip in ip_list:
         execute_actions(ip, args, "yes" if "{" in args.ip else "no")
+
 
 #ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
 ##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
