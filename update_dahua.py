@@ -147,106 +147,71 @@ def getinfoCam(camera_ip, username, password, channel_id, cam):
                 continue
 
 def getAllSettings(camera_ip, username, password):
-    number=numberCam(camera_ip, username, password)
-    port=number[1]
+    number = numberCam(camera_ip, username, password)
+    port = number[1]
     url = f"http://{camera_ip}:{port}/cgi-bin/encode.cgi?action=getConfigCaps"
     url_user = f"http://{camera_ip}:{port}/cgi-bin/userManager.cgi?action=getUserInfoAll"
+    
+    # Obtenir les configurations et les informations utilisateur
     r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
     r_user = requests.get(url_user, stream=True, auth=HTTPDigestAuth(username, password))
+    
     print(r.status_code)
-    if r.status_code==401:
+    if r.status_code == 401:
         print("Unauthorized")
-    if r.status_code == 200:
-                    print("Pour IP "+camera_ip)
-                    print("INFO USER :")
-                    text_user=r_user.text
-                    # Définition de l'expression régulière pour extraire les noms, les groupes et les AuthorityList
-                    name_pattern = re.compile(r"users\[(\d+)\]\.Name=(\w+)")
-                    group_pattern = re.compile(r"users\[(\d+)\]\.Group=(\w+)")
-                    authority_pattern = re.compile(r"users\[(\d+)\]\.AuthorityList\[\d+\]=(\w+)")
+    elif r.status_code == 200:
+        print(f"Pour IP {camera_ip}")
+        print("INFO USER :")
+        
+        text_user = r_user.text
+        
+        # Définition de l'expression régulière pour extraire les noms, les groupes et les AuthorityList
+        patterns = {
+            'names': re.compile(r"users\[(\d+)\]\.Name=(\w+)"),
+            'groups': re.compile(r"users\[(\d+)\]\.Group=(\w+)"),
+            'authorities': re.compile(r"users\[(\d+)\]\.AuthorityList\[\d+\]=(\w+)")
+        }
+        
+        # Recherche des noms, des groupes et des AuthorityList
+        data = {key: {} for key in patterns.keys()}
+        
+        for key, pattern in patterns.items():
+            for match in pattern.finditer(text_user):
+                user_index, value = match.groups()
+                if key == 'authorities':
+                    data[key].setdefault(int(user_index), []).append(value)
+                else:
+                    data[key][int(user_index)] = value
+        
+        # Affichage des résultats
+        for user_index in data['names'].keys():
+            print(f"User {user_index}")
+            print(f"Name: {data['names'][user_index]}")
+            print(f"Group: {data['groups'][user_index]}")
+            print(f"Droit: {data['authorities'][user_index]}")
+            print()
+        
+        print("-----------")
+        
+        # Définition des formats et des paramètres à extraire
+        formats = ['MainFormat[0]', 'ExtraFormat[0]']
+        params = ['CompressionTypes', 'ResolutionTypes', 'FPSMax', 'BitRateOptions']
+        
+        # Fonction pour extraire et afficher les paramètres
+        def extract_and_print_params(text, format_type):
+            try:
+                for param in params:
+                    target_line = next(line for line in text.split('\n') if f'caps[0].{format_type}.Video.{param}' in line)
+                    value = target_line.split('=')[1].strip()
+                    print(f"{param.replace('Types', '').replace('Options', '')} : {value}")
+                print("-----------")
+            except StopIteration:
+                print(f"Erreur d'extraction pour {format_type}")
+        
+        # Extraire et afficher les paramètres pour chaque format
+        extract_and_print_params(r.text, 'MainFormat[0]')
+        extract_and_print_params(r.text, 'ExtraFormat[0]')
 
-                    # Recherche des noms, des groupes et des AuthorityList
-                    names = {}
-                    groups = {}
-                    authorities = {}
-
-                    for match in name_pattern.finditer(text_user):
-                        user_index, name = match.groups()
-                        names[int(user_index)] = name
-
-                    for match in group_pattern.finditer(text_user):
-                        user_index, group = match.groups()
-                        groups[int(user_index)] = group
-
-                    for match in authority_pattern.finditer(text_user):
-                        user_index, authority = match.groups()
-                        authorities.setdefault(int(user_index), []).append(authority)
-
-                    # Affichage des résultats
-                    for user_index in names.keys():
-                        print("User", user_index)
-                        print("Name:", names[user_index])
-                        print("Group:", groups[user_index])
-                        print("Droit:", authorities[user_index])
-                        print()
-                    print("-----------")
-                    try:
-                        try:
-                            target_line_compression = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.CompressionTypes' in line)
-                            # Extraire la valeur de ResolutionTypes à partir de la ligne
-                            compression_types = target_line_compression.split('=')[1].strip()
-                            target_line_resolution = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.ResolutionTypes' in line)
-                            resolution_types = target_line_resolution.split('=')[1].strip()
-                            target_line_fps = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.FPSMax' in line)
-                            fps_types = target_line_fps.split('=')[1].strip()
-                            target_line_bitrate = next(line for line in r.text.split('\n') if 'caps[0].MainFormat[0].Video.BitRateOptions' in line)
-                            bitrate_types = target_line_bitrate.split('=')[1].strip()
-                            print("Flux primaire")
-                            print_results(compression_types,resolution_types,fps_types,bitrate_types)
-                            print("-----------")
-                            #print(r.text)
-                            # Trouver la ligne contenant la valeur de ResolutionTypes
-                            target_line_compression = next(line for line in r.text.split('\n') if 'caps[0].ExtraFormat[0].Video.CompressionTypes' in line)
-                            # Extraire la valeur de ResolutionTypes à partir de la ligne
-                            compression_types = target_line_compression.split('=')[1].strip()
-                            target_line_resolution = next(line for line in r.text.split('\n') if 'caps[0].ExtraFormat[0].Video.ResolutionTypes' in line)
-                            resolution_types = target_line_resolution.split('=')[1].strip()
-                            target_line_fps = next(line for line in r.text.split('\n') if 'caps[0].ExtraFormat[0].Video.FPSMax' in line)
-                            fps_types = target_line_fps.split('=')[1].strip()
-                            target_line_bitrate = next(line for line in r.text.split('\n') if 'caps[0].ExtraFormat[0].Video.BitRateOptions' in line)
-                            bitrate_types = target_line_bitrate.split('=')[1].strip()
-                            print("Flux secondaire")
-                            print_results(compression_types,resolution_types,fps_types,bitrate_types) 
-                            print("-----------")
-                        except:
-                            target_line_compression = next(line for line in r.text.split('\n') if 'caps.MainFormat[0].Video.CompressionTypes' in line)
-                            # Extraire la valeur de ResolutionTypes à partir de la ligne
-                            compression_types = target_line_compression.split('=')[1].strip()
-                            target_line_resolution = next(line for line in r.text.split('\n') if 'caps.MainFormat[0].Video.ResolutionTypes' in line)
-                            resolution_types = target_line_resolution.split('=')[1].strip()
-                            target_line_fps = next(line for line in r.text.split('\n') if 'caps.MainFormat[0].Video.FPSMax' in line)
-                            fps_types = target_line_fps.split('=')[1].strip()
-                            target_line_bitrate = next(line for line in r.text.split('\n') if 'caps.MainFormat[0].Video.BitRateOptions' in line)
-                            bitrate_types = target_line_bitrate.split('=')[1].strip()
-                            print("Flux primaire")
-                            print_results(compression_types,resolution_types,fps_types,bitrate_types)
-                            print("-----------")
-                            #print(r.text)
-                            # Trouver la ligne contenant la valeur de ResolutionTypes
-                            target_line_compression = next(line for line in r.text.split('\n') if 'caps.ExtraFormat[0].Video.CompressionTypes' in line)
-                            # Extraire la valeur de ResolutionTypes à partir de la ligne
-                            compression_types = target_line_compression.split('=')[1].strip()
-                            target_line_resolution = next(line for line in r.text.split('\n') if 'caps.ExtraFormat[0].Video.ResolutionTypes' in line)
-                            resolution_types = target_line_resolution.split('=')[1].strip()
-                            target_line_fps = next(line for line in r.text.split('\n') if 'caps.ExtraFormat[0].Video.FPSMax' in line)
-                            fps_types = target_line_fps.split('=')[1].strip()
-                            target_line_bitrate = next(line for line in r.text.split('\n') if 'caps.ExtraFormat[0].Video.BitRateOptions' in line)
-                            bitrate_types = target_line_bitrate.split('=')[1].strip()
-                            print("Flux secondaire")
-                            print_results(compression_types,resolution_types,fps_types,bitrate_types) 
-                            print("-----------")
-                    except:
-                        print("Erreur interne")
 def setResolution(camera_ip, username, password, channel_id,resolution,cam):
     number=numberCam(camera_ip, username, password)
     port=number[1]
