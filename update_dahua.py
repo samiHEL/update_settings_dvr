@@ -631,8 +631,29 @@ def reboot_dvr(camera_ip ,username, password):
 
 #getinfoCam()
 #setCompression("172.24.14.23","admin","Veesion2023!",8,"H.264")
-if __name__ == "__main__":
+def execute_actions(ip, args, cam):
+    if args.r:
+        setResolution(ip, args.u, args.p, args.ch, args.r, cam)
+    if args.f:
+        setFps(ip, args.u, args.p, args.ch, args.f, cam)
+    if args.b:
+        setBitrate(ip, args.u, args.p, args.ch, args.b, cam)
+    if args.c:
+        setCompression(ip, args.u, args.p, args.ch, args.c, cam)
+    if args.m:
+        setDetection(ip, args.u, args.p, args.ch, args.m, cam)
+    if args.bc:
+        setBitrateControl(ip, args.u, args.p, args.ch, args.bc, cam)
+    if args.ch and not any([args.r, args.f, args.b, args.c, args.m, args.bc]):
+        getinfoCam(ip, args.u, args.p, args.ch, cam)
+    if not any([args.ch, args.r, args.f, args.b, args.c, args.m, args.bc, args.reboot]):
+        getAllSettings(ip, args.u, args.p)
+    if args.country:
+        setTime(ip, args.u, args.p, args.country)
+    if args.reboot:
+        reboot_dvr(ip, args.u, args.p)
 
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip", type=str, required=True)
     parser.add_argument("--u", type=str, required=True)
@@ -646,53 +667,11 @@ if __name__ == "__main__":
     parser.add_argument("--bc", type=str, required=False)
     parser.add_argument("--country", type=str, required=False)
     parser.add_argument("--reboot", type=str, required=False)
-
     args = parser.parse_args()
-    if "{" in args.ip :
-        ip_list = expand_ip_range(args.ip)
-        print(ip_list)
-        for ip in ip_list:
-            if args.r!=None:
-                setResolution(ip, args.u, args.p, args.ch, args.r,"yes")
-            if args.f!=None:
-                setFps(ip, args.u, args.p, args.ch, args.f,"yes")
-            if args.b!=None:
-                setBitrate(ip, args.u, args.p, args.ch, args.b,"yes")
-            if args.c!=None:
-                setCompression(ip, args.u, args.p, args.ch, args.c,"yes")
-            if args.m!=None:
-                setDetection(ip, args.u, args.p, args.ch,args.m,"yes")  
-            if args.bc!=None:
-                setBitrateControl(ip, args.u, args.p, args.ch,args.bc,"yes")  
-            if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
-                getinfoCam(ip, args.u, args.p,args.ch,"yes")
-            if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None and args.reboot == None:
-                getAllSettings(ip, args.u, args.p)
-            if args.country!=None:
-                setTime(ip, args.u, args.p, args.country)  
-            if args.u!=None and args.p!=None and ip!=None and args.reboot:
-                reboot_dvr(ip, args.u, args.p)
-    else:
-        if args.r!=None:
-            setResolution(args.ip, args.u, args.p, args.ch, args.r,"no")
-        if args.f!=None:
-            setFps(args.ip, args.u, args.p, args.ch, args.f,"no")
-        if args.b!=None:
-            setBitrate(args.ip, args.u, args.p, args.ch, args.b,"no")
-        if args.c!=None:
-            setCompression(args.ip, args.u, args.p, args.ch, args.c,"no")
-        if args.m!=None:
-            setDetection(args.ip, args.u, args.p, args.ch,args.m,"no")  
-        if args.bc!=None:
-            setBitrateControl(args.ip, args.u, args.p, args.ch,args.bc,"no") 
-        if args.ch!=None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None:
-            getinfoCam(args.ip, args.u, args.p,args.ch,"no")
-        if args.ch==None and args.c==None and args.b==None and args.f==None and args.r==None and args.m==None and args.reboot == None:
-            getAllSettings(args.ip, args.u, args.p)
-        if args.country!=None:
-            setTime(args.ip, args.u, args.p, args.country)
-        if args.u!=None and args.p!=None and args.ip!=None and args.reboot:
-            reboot_dvr(args.ip, args.u, args.p)
+
+    ip_list = expand_ip_range(args.ip) if "{" in args.ip else [args.ip]
+    for ip in ip_list:
+        execute_actions(ip, args, "yes" if "{" in args.ip else "no")
 
 #ParamVideo#url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/devVideoInput.cgi?action=getCaps&channel=1&streamType=2"
 ##url = "http://admin:Veesion2023%21@172.24.14.23:80/cgi-bin/configManager.cgi?action=getConfig&name=VideoInOptions"
