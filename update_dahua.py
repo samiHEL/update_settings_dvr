@@ -84,7 +84,13 @@ def fetch_camera_config(camera_ip, username, password, channel_id, format_type, 
         nbCam = 1
 
     for x in range(nbCam):
-        url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[{x}].{format_type}[0]"
+        if channel_id == "all_sub":
+            url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[{x}].ExtraFormat[0]"
+        elif channel_id == "all_main":
+            url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[{x}].MainFormat[0]"
+        else:
+            url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[{x}].{format_type}[0]"
+
         r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
         if r.status_code == 200:
             try:
