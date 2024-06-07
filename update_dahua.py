@@ -6,23 +6,29 @@ import subprocess
 from datetime import datetime
 import pytz
 
-# Créer une liste d'adresses IP pour les caméras IP
+#CREER LISTE ADRESSE IP QUAND CAM IP
 def expand_ip_range(ip_range):
     ip_list = []
     match = re.match(r'^(\d+\.\d+\.\d+\.)\{([\d,]+)\}$', ip_range)
+    
     if match:
         prefix = match.group(1)
         numbers = match.group(2).split(',')
+        
         for num in numbers:
             ip_list.append(prefix + num)
+    
     return ip_list
 
-# Trouver les ports ouverts sur un DVR ou une caméra IP
+#TROUVER PORT OUVERT SUR DVR OU CAM IP
 def scan_ports(target_ip):
     open_ports = []
+
+    # Exécute la commande Nmap avec les options spécifiées
     command = ['nmap', target_ip, '-p', '1-65535', '--open']
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
+    # Vérifie si l'exécution de la commande a réussi
     if process.returncode == 0:
         lines = output.decode('utf-8').split('\n')
         for line in lines:
@@ -35,41 +41,42 @@ def scan_ports(target_ip):
         print(f"Erreur lors de l'exécution de la commande Nmap: {error.decode('utf-8')}")
         return None
 
-# Vérifier si le port est un port HTTP
+#LE PORT EST IL UN PORT HTTP ?
 def is_http_port(camera_ip, username, password, port):
     url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Encode[1].ExtraFormat[0]"
-    url2 = f'http://www.google.com:{port}'
+    url2 = f'http://www.google.com:{port}' 
     try:
         r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
         r.raise_for_status()
-        print(f"test fonctionnel avec port {port}")
-        return True
+        print("test fonctionnel avec port  "+str(port))
+        return True  # La connexion a réussi, donc c'est potentiellement un port HTTP
     except (requests.exceptions.RequestException):
         try:
             r = requests.get(url2, stream=True, auth=HTTPDigestAuth(username, password), timeout=5)
             r.raise_for_status()
-            print(f"test fonctionnel avec port {port}")
+            print("test fonctionnel avec port  "+str(port))
             return True
-        except:
-            print(f"erreur avec port {port}")
-            return False
+        except:   
+            print("erreur avec port "+str(port))
+            return False  # La connexion a échoué
 
-# Afficher les résultats
-def print_results(compression_types, resolution_types, fps_types, bitrate_types):
-    print(f'Compression_types : {compression_types}')
-    print(f'Resolution_types: {resolution_types}')
-    print(f'Fps_types : {fps_types}')
-    print(f'Bitrate_types: {bitrate_types.replace(",", "-")}')
 
-def print_results_cam(compression_types, resolution_types, fps_types, bitrate_types, channel, bitratecontrol):
-    print(f'channel : {channel}')
-    print(f'Compression_types : {compression_types}')
-    print(f'Resolution_types: {resolution_types}')
-    print(f'Fps_types : {fps_types}')
-    print(f'bitrate control : {bitratecontrol}')
-    print(f'Bitrate_types: {bitrate_types.replace(",", "-")}')
+def print_results(compression_types,resolution_types,fps_types,bitrate_types):
+    print('Compression_types : ', compression_types)
+    print('Resolution_types: ', resolution_types)
+    print('Fps_types : ', fps_types)
+    print('Bitrate_types: ', bitrate_types.replace(",","-"))
+def print_results_cam(compression_types,resolution_types,fps_types,bitrate_types,channel, bitratecontrol):
+    print('channel : ', channel)
+    print('Compression_types : ', compression_types)
+    print('Resolution_types: ', resolution_types)
+    print('Fps_types : ', fps_types)
+    print('bitrate control : ', bitratecontrol)
+    print('Bitrate_types: ', bitrate_types.replace(",","-"))
 
-# Trouver le nombre de caméras sur un DVR
+
+
+#TROUVER NOMBRE DE CAM SUR UN DVR / SI CAM IP NE PAS PRENDRE EN COMPTE
 def numberCam(camera_ip, username, password):
         open_ports=scan_ports(camera_ip)
         print(open_ports)
