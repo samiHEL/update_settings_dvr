@@ -71,27 +71,37 @@ def print_results_cam(compression_types, resolution_types, fps_types, bitrate_ty
 
 # Trouver le nombre de caméras sur un DVR
 def numberCam(camera_ip, username, password):
-    open_ports = scan_ports(camera_ip)
-    potential_http_ports = []
-    for port in open_ports:
-        if is_http_port(camera_ip, username, password, port):
-            potential_http_ports.append(port)
-            break
-    if potential_http_ports:
-        print(f"Le ports HTTP potentiel est: {potential_http_ports[0]}")
-    else:
-        print("Aucun port HTTP potentiel trouvé.")
-    port = potential_http_ports[0]
-    url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
-    r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
-    t = r.text
-    matches = re.findall(r'table\.Ptz\[(\d+)\]', t)
-    if matches:
-        dernier_chiffre = int(matches[-1])
-        return [dernier_chiffre + 1, port]
-    else:
-        print("nombre de camera introuvable")
-        return [1, port]
+        open_ports=scan_ports(camera_ip)
+        print(open_ports)
+        potential_http_ports = []
+        for port in open_ports:
+            try:
+                if is_http_port(camera_ip, username, password, port):
+                    potential_http_ports.append(port)
+                    break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
+            except:
+                print(f"L'itération pour le port {port} a pris trop de temps (plus de 30 secondes).")
+                # Ajoutez ici un code pour gérer le dépassement du temps, si nécessaire
+        # for port in open_ports:
+        #     if is_http_port(camera_ip, username, password, port):
+        #         potential_http_ports.append(port)
+        #         break  # Sortir de la boucle dès qu'un port HTTP potentiel est trouvé
+        #potential_http_ports = [port for port in open_ports if is_http_port(camera_ip, username, password, port)]
+        if potential_http_ports:
+            print(f"Le ports HTTP potentiel est: {potential_http_ports[0]}")
+        else:
+            print("Aucun port HTTP potentiel trouvé.")
+        url = f"http://{camera_ip}:{port}/cgi-bin/configManager.cgi?action=getConfig&name=Ptz"
+        r = requests.get(url, stream=True, auth=HTTPDigestAuth(username, password))
+        t=r.text
+        matches = re.findall(r'table\.Ptz\[(\d+)\]', t)
+        # Obtenir le dernier chiffre trouvé
+        if matches:
+            dernier_chiffre = int(matches[-1])
+            return [dernier_chiffre+1,port]
+        else:
+            print("nombre de camera introuvable")
+            return [1,port]
 
 # Obtenir des informations sur la caméra
 def getinfoCam(camera_ip, username, password, channel_id, cam):
