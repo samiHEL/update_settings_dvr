@@ -413,24 +413,10 @@ def fetch_and_print(url, flux_type, username, password):
             root = ET.fromstring(response.text)
             namespace_uri = root.tag.split('}', 1)[0][1:]
 
-            if namespace_uri in ns['ns']:
-                data = parse_capabilities(root, ns)
-            elif namespace_uri in ns2['xmlns']:
-                data = parse_capabilities(root, ns2)
-            elif namespace_uri in ns3['xmlns']:
-                data = parse_capabilities(root, ns3)
-            elif namespace_uri in ns4['xmlns']:
-                data = parse_capabilities(root, ns4)
-            elif namespace_uri in ns5['xmlns']:
-                data = parse_capabilities(root, ns5)
-            elif namespace_uri in ns6['xmlns']:
-                data = parse_capabilities(root, ns6)
-            else:
-                data = {}
-
+            data = parse_capabilities(root, namespace_uri)
             if data:
                 print(f"// Flux {flux_type} //")
-                print_settings(data)
+                print_settings(data['videoCodec_opt'], data['videoResolutionWidth_opt'], data['videoResolutionHeight_opt'], data['maxFrameRate_opt_list'], data['constantBitRate_opt'])
                 print("---------------------")
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
@@ -441,22 +427,23 @@ def fetch_and_print(url, flux_type, username, password):
     except requests.RequestException as e:
         print(f"Erreur de requête : {e}")
 
-def parse_capabilities(root, ns):
+def parse_capabilities(root, namespace_uri):
     try:
-        videoCodecTypeElement = root.find('.//ns:videoCodecType', namespaces=ns)
+        ns = get_namespace(namespace_uri)
+        videoCodecTypeElement = root.find(f'.//{ns}:videoCodecType', namespaces={ns: namespace_uri})
         videoCodec_opt = videoCodecTypeElement.attrib['opt']
 
-        videoResolutionWidth = root.find('.//ns:videoResolutionWidth', namespaces=ns)
+        videoResolutionWidth = root.find(f'.//{ns}:videoResolutionWidth', namespaces={ns: namespace_uri})
         videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
 
-        videoResolutionHeight = root.find('.//ns:videoResolutionHeight', namespaces=ns)
+        videoResolutionHeight = root.find(f'.//{ns}:videoResolutionHeight', namespaces={ns: namespace_uri})
         videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
 
-        maxFrameRate = root.find('.//ns:maxFrameRate', namespaces=ns)
+        maxFrameRate = root.find(f'.//{ns}:maxFrameRate', namespaces={ns: namespace_uri})
         maxFrameRate_opt = maxFrameRate.attrib['opt']
         maxFrameRate_opt_list = [int(x) / 100 for x in maxFrameRate_opt.split(',') if x]
 
-        constantBitRate = root.find('.//ns:constantBitRate', namespaces=ns)
+        constantBitRate = root.find(f'.//{ns}:constantBitRate', namespaces={ns: namespace_uri})
         constantBitRate_min = constantBitRate.attrib['min']
         constantBitRate_max = constantBitRate.attrib['max']
         constantBitRate_opt = {"valeur min": constantBitRate_min, "valeur max": constantBitRate_max}
@@ -471,6 +458,22 @@ def parse_capabilities(root, ns):
     except Exception as e:
         print(f"Erreur lors de l'analyse XML : {e}")
         return {}
+
+def get_namespace(uri):
+    if uri == ns['ns']:
+        return 'ns'
+    elif uri == ns2['xmlns']:
+        return 'xmlns'
+    elif uri == ns3['xmlns']:
+        return 'xmlns'
+    elif uri == ns4['xmlns']:
+        return 'xmlns'
+    elif uri == ns5['xmlns']:
+        return 'xmlns'
+    elif uri == ns6['xmlns']:
+        return 'xmlns'
+    else:
+        return None
     
 def get_param(camera_ip, username, password):
     open_ports=scan_ports(camera_ip)
