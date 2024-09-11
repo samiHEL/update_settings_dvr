@@ -680,7 +680,7 @@ def print_results(id_channel, width_resolution, height_resolution, type_bande_pa
     print('Resolution : ', str(width_resolution)+"x"+str(height_resolution))
     print('Type bande passante : ', type_bande_passante)
     if int(image_par_sec)==0:
-        print('Image par seconde : MAX')
+        print('Image par seconde : MAX fps')
     else:
         print('Image par seconde : ', int(image_par_sec)/100 ,' fps')
         print('Debit binaire max : ', debit_bin_max)

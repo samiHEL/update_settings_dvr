@@ -171,7 +171,7 @@ def print_results_cam(camera_number,compression_types, resolution_types, fps_typ
     print('Resolution : ', resolution_types)
     print('Type bande passante : ', bitratecontrol)
     if int(float(fps_types)) == 0:
-        print('Image par seconde : MAX')
+        print('Image par seconde : MAX fps')
     else:
         print('Image par seconde : ', int(float(fps_types)), 'fps')
     print('Debit binaire max : ', bitrate_types.replace(",", "-"))
