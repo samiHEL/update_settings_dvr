@@ -738,7 +738,6 @@ def main(args=None):
                     if args.country!=None:
                         setTime(ip, args.u, args.p, args.country)
                         return
-                    get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
                     print("debut")
                     if args.r!=None:
                         set_resolution(ip, args.u, args.p, args.ch, args.r,"yes")
@@ -754,8 +753,7 @@ def main(args=None):
                         get_camera_parameters(ip, args.u, args.p, args.ch,"yes")
                     if args.bc!=None:
                         set_bitrateControl(ip, args.u, args.p, args.ch, args.bc, "yes")
-                    print("fin")
-                    get_camera_parameters(ip, args.u, args.p, args.ch,"yes")   
+                    print("fin") 
             print("possibility to display : ")
             get_camera_parameters_unique(ip_list[0], args.u, args.p)
     elif "{"  not in args.ip and args.app :  
@@ -788,7 +786,6 @@ def main(args=None):
             if args.country!=None:
                 setTime(args.ip, args.u, args.p, args.country)
                 return
-            get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
             print("debut")
             if args.r!=None:
                 set_resolution(args.ip, args.u, args.p, args.ch, args.r,"no")
@@ -807,7 +804,6 @@ def main(args=None):
             if args.encrypt!=None:
                 encryption(args.ip, args.u, args.p, args.encrypt)
             print("fin")
-            get_camera_parameters(args.ip, args.u, args.p, args.ch,"no")
             print("possibility to display : ")
             get_camera_parameters_unique(args.ip, args.u, args.p)
 

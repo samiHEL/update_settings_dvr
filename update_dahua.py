@@ -516,7 +516,6 @@ def execute_actions(session, ip, args, cam):
         return
     # Si args.ch est spécifié, vérifier si l'utilisateur veut un seul canal ou toutes les caméras
     channel_id = args.ch if args.ch else "all_main"
-    getinfoCam(session, ip, args.u, args.p, channel_id, cam)
     print("debut")
     if args.r:
         setResolution(session, ip, args.u, args.p, channel_id, args.r, cam)
@@ -540,7 +539,6 @@ def execute_actions(session, ip, args, cam):
         print("reboot")
         reboot_dvr(session, ip, args.u, args.p)
     print("fin")
-    getinfoCam(session, ip, args.u, args.p, channel_id, cam)
 
 # Main function
 def main(args=None):
