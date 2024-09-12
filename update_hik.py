@@ -441,84 +441,206 @@ def encryption(camera_ip, username, password, param):
         print(f"Erreur : {response.status_code} - {response.text}")
 
 def get_camera_parameters_unique(camera_ip, username, password):
-    number = get_param(camera_ip, username, password)
-    port = number[1]
-    print("Pour IP " + camera_ip)
+    number=get_param(camera_ip, username, password)
+    port=number[1]
+    url_image_settings_main = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101/capabilities'
+    url_image_settings_sub = f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/102/capabilities'
+    url_image_settings = f'http://{camera_ip}:{port}/ISAPI/Security/users/'
+    print("Pour IP "+camera_ip)
+    response_get = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
 
-    urls = [
-        (f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/101/capabilities', "primaire"),
-        (f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/102/capabilities', "secondaire")
-    ]
+    # Vérifier si la requête a réussi
+    if response_get.status_code == 200:
+        xml = response_get.text
+        print(xml)
+    else:
+        print(f"Erreur : {response_get.status_code} - {response_get.text}")
+    tab=[[url_image_settings_main,"primaire"],[url_image_settings_sub,"secondaire"]]
+    for t in tab:
+        try:
+            # Effectuer une requête HTTP GET avec une authentification basique
+            response = requests.get(t[0], auth=HTTPDigestAuth(username, password))
 
-    successful = False
-    for url, flux_type in urls:
-        successful = fetch_and_print(url, flux_type, username, password)
-        if not successful:
-            break  # Si l'une des URL échoue, passez aux alternatives
+            # Vérifier si la requête a réussi (code d'état 200)
+            if response.status_code == 200:
 
-    if not successful:
-        print("Essai avec les alternatives : /ISAPI/Streaming/channels/201 et /ISAPI/Streaming/channels/202")
-        urls_alternatives = [
-            (f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/201/capabilities', "primaire"),
-            (f'http://{camera_ip}:{port}/ISAPI/Streaming/channels/202/capabilities', "secondaire")
-        ]
-        for url, flux_type in urls_alternatives:
-            fetch_and_print(url, flux_type, username, password)
+                xml = response.text
+                #print(xml)
+                root = ET.fromstring(xml)
+                namespace_uri = root.tag.split('}', 1)[0][1:]
+                if namespace_uri in ns['ns'] :
 
-def fetch_and_print(url, flux_type, username, password):
-    try:
-        response = requests.get(url, auth=HTTPDigestAuth(username, password))
-        if response.status_code == 200:
-            root = ET.fromstring(response.text)
-            namespace_uri = root.tag.split('}', 1)[0][1:]
+                    videoCodecTypeElement = root.find('.//ns:videoCodecType', namespaces=ns)
+                    videoCodec_opt = videoCodecTypeElement.attrib['opt']
 
-            data = parse_capabilities(root, namespace_uri)
-            if data:
-                print(f"// Flux {flux_type} //")
-                print_settings(data['videoCodec_opt'], data['videoResolutionWidth_opt'], data['videoResolutionHeight_opt'], data['maxFrameRate_opt_list'], data['constantBitRate_opt'])
-                print("---------------------")
-                return True
+                    videoResolutionWidth = root.find('.//ns:videoResolutionWidth', namespaces=ns)
+                    videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+
+                    videoResolutionHeight = root.find('.//ns:videoResolutionHeight', namespaces=ns)
+                    videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+
+                    maxFrameRate = root.find('.//ns:maxFrameRate', namespaces=ns)
+                    maxFrameRate_opt = maxFrameRate.attrib['opt']
+                    # Diviser la chaîne en une liste de chaînes
+                    string_list = maxFrameRate_opt.split(',')
+
+                    # Convertir chaque élément de la liste en entier
+                    int_list = [int(x) for x in string_list]
+                    maxFrameRate_opt_list = [x / 100 for x in int_list]
+                    maxFrameRate_opt_list.pop(0)
+
+                    constantBitRate = root.find('.//ns:constantBitRate', namespaces=ns)
+                    constantBitRate_min = constantBitRate.attrib['min']
+                    constantBitRate_max = constantBitRate.attrib['max']
+                    constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+                    print("// Flux "+t[1]+" //")
+                    print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+                    print("---------------------")
+                elif  namespace_uri in ns2['xmlns'] :
+                    videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns2)
+                    videoCodec_opt = videoCodecTypeElement.attrib['opt']
+
+                    videoResolutionWidth = root.find('.//xmlns:videoResolutionWidth', namespaces=ns2)
+                    videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+
+                    videoResolutionHeight = root.find('.//xmlns:videoResolutionHeight', namespaces=ns2)
+                    videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+
+                    maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns2)
+                    maxFrameRate_opt = maxFrameRate.attrib['opt']
+                    # Diviser la chaîne en une liste de chaînes
+                    string_list = maxFrameRate_opt.split(',')
+
+                    # Convertir chaque élément de la liste en entier
+                    int_list = [int(x) for x in string_list]
+                    maxFrameRate_opt_list = [x / 100 for x in int_list]
+                    maxFrameRate_opt_list.pop(0)
+
+                    constantBitRate = root.find('.//xmlns:constantBitRate', namespaces=ns2)
+                    constantBitRate_min = constantBitRate.attrib['min']
+                    constantBitRate_max = constantBitRate.attrib['max']
+                    constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+                    
+                    print("// Flux "+t[1]+" //")
+                    print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+                    print("---------------------")
+                elif  namespace_uri in ns3['xmlns'] :
+                    videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns3)
+                    videoCodec_opt = videoCodecTypeElement.attrib['opt']
+
+                    videoResolutionWidth = root.find('.//xmlns:videoResolutionWidth', namespaces=ns3)
+                    videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+
+                    videoResolutionHeight = root.find('.//xmlns:videoResolutionHeight', namespaces=ns3)
+                    videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+
+                    maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns3)
+                    maxFrameRate_opt = maxFrameRate.attrib['opt']
+                    # Diviser la chaîne en une liste de chaînes
+                    string_list = maxFrameRate_opt.split(',')
+
+                    # Convertir chaque élément de la liste en entier
+                    int_list = [int(x) for x in string_list]
+                    maxFrameRate_opt_list = [x / 100 for x in int_list]
+                    maxFrameRate_opt_list.pop(0)
+
+                    constantBitRate = root.find('.//xmlns:constantBitRate', namespaces=ns3)
+                    constantBitRate_min = constantBitRate.attrib['min']
+                    constantBitRate_max = constantBitRate.attrib['max']
+                    constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+                    
+                    print("// Flux "+t[1]+" //")
+                    print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+                    print("---------------------")
+                elif  namespace_uri in ns4['xmlns'] :
+                    videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns4)
+                    videoCodec_opt = videoCodecTypeElement.attrib['opt']
+
+                    videoResolutionWidth = root.find('.//xmlns:videoResolutionWidth', namespaces=ns4)
+                    videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+
+                    videoResolutionHeight = root.find('.//xmlns:videoResolutionHeight', namespaces=ns4)
+                    videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+
+                    maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns4)
+                    maxFrameRate_opt = maxFrameRate.attrib['opt']
+                    # Diviser la chaîne en une liste de chaînes
+                    string_list = maxFrameRate_opt.split(',')
+
+                    # Convertir chaque élément de la liste en entier
+                    int_list = [int(x) for x in string_list]
+                    maxFrameRate_opt_list = [x / 100 for x in int_list]
+                    maxFrameRate_opt_list.pop(0)
+
+                    constantBitRate = root.find('.//xmlns:constantBitRate', namespaces=ns4)
+                    constantBitRate_min = constantBitRate.attrib['min']
+                    constantBitRate_max = constantBitRate.attrib['max']
+                    constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+                    
+                    print("// Flux "+t[1]+" //")
+                    print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+                    print("---------------------")
+                elif  namespace_uri in ns5['xmlns'] :
+                    videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns5)
+                    videoCodec_opt = videoCodecTypeElement.attrib['opt']
+
+                    videoResolutionWidth = root.find('.//xmlns:videoResolutionWidth', namespaces=ns5)
+                    videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+
+                    videoResolutionHeight = root.find('.//xmlns:videoResolutionHeight', namespaces=ns5)
+                    videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+
+                    maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns5)
+                    maxFrameRate_opt = maxFrameRate.attrib['opt']
+                    # Diviser la chaîne en une liste de chaînes
+                    string_list = maxFrameRate_opt.split(',')
+
+                    # Convertir chaque élément de la liste en entier
+                    int_list = [int(x) for x in string_list]
+                    maxFrameRate_opt_list = [x / 100 for x in int_list]
+                    maxFrameRate_opt_list.pop(0)
+
+                    constantBitRate = root.find('.//xmlns:constantBitRate', namespaces=ns5)
+                    constantBitRate_min = constantBitRate.attrib['min']
+                    constantBitRate_max = constantBitRate.attrib['max']
+                    constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+                    
+                    print("// Flux "+t[1]+" //")
+                    print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+                    print("---------------------")
+                elif  namespace_uri in ns6['xmlns'] :
+                    videoCodecTypeElement = root.find('.//xmlns:videoCodecType', namespaces=ns6)
+                    videoCodec_opt = videoCodecTypeElement.attrib['opt']
+
+                    videoResolutionWidth = root.find('.//xmlns:videoResolutionWidth', namespaces=ns6)
+                    videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
+
+                    videoResolutionHeight = root.find('.//xmlns:videoResolutionHeight', namespaces=ns6)
+                    videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
+
+                    maxFrameRate = root.find('.//xmlns:maxFrameRate', namespaces=ns6)
+                    maxFrameRate_opt = maxFrameRate.attrib['opt']
+                    # Diviser la chaîne en une liste de chaînes
+                    string_list = maxFrameRate_opt.split(',')
+
+                    # Convertir chaque élément de la liste en entier
+                    int_list = [int(x) for x in string_list]
+                    maxFrameRate_opt_list = [x / 100 for x in int_list]
+                    maxFrameRate_opt_list.pop(0)
+
+                    constantBitRate = root.find('.//xmlns:constantBitRate', namespaces=ns6)
+                    constantBitRate_min = constantBitRate.attrib['min']
+                    constantBitRate_max = constantBitRate.attrib['max']
+                    constantBitRate_opt={"valeur min ":constantBitRate_min,"valeur max ":constantBitRate_max}
+                    
+                    print("// Flux "+t[1]+" //")
+                    print_settings(videoCodec_opt,videoResolutionWidth_opt,videoResolutionHeight_opt,maxFrameRate_opt_list,constantBitRate_opt)
+                    print("---------------------")
             else:
                 print(f"Erreur : {response.status_code} - {response.text}")
-                return False
-        else:
-            print(f"Erreur : {response.status_code} - {response.text}")
-            return False
-    except requests.RequestException as e:
-        print(f"Erreur de requête : {e}")
-        return False
 
-def parse_capabilities(root, namespace_uri):
-    try:
-        ns = get_namespace(namespace_uri)
-        videoCodecTypeElement = root.find(f'.//{ns}:videoCodecType', namespaces={ns: namespace_uri})
-        videoCodec_opt = videoCodecTypeElement.attrib['opt']
-
-        videoResolutionWidth = root.find(f'.//{ns}:videoResolutionWidth', namespaces={ns: namespace_uri})
-        videoResolutionWidth_opt = videoResolutionWidth.attrib['opt']
-
-        videoResolutionHeight = root.find(f'.//{ns}:videoResolutionHeight', namespaces={ns: namespace_uri})
-        videoResolutionHeight_opt = videoResolutionHeight.attrib['opt']
-
-        maxFrameRate = root.find(f'.//{ns}:maxFrameRate', namespaces={ns: namespace_uri})
-        maxFrameRate_opt = maxFrameRate.attrib['opt']
-        maxFrameRate_opt_list = [int(x) / 100 for x in maxFrameRate_opt.split(',') if x]
-
-        constantBitRate = root.find(f'.//{ns}:constantBitRate', namespaces={ns: namespace_uri})
-        constantBitRate_min = constantBitRate.attrib['min']
-        constantBitRate_max = constantBitRate.attrib['max']
-        constantBitRate_opt = {"valeur min": constantBitRate_min, "valeur max": constantBitRate_max}
-
-        return {
-            'videoCodec_opt': videoCodec_opt,
-            'videoResolutionWidth_opt': videoResolutionWidth_opt,
-            'videoResolutionHeight_opt': videoResolutionHeight_opt,
-            'maxFrameRate_opt_list': maxFrameRate_opt_list,
-            'constantBitRate_opt': constantBitRate_opt
-        }
-    except Exception as e:
-        print(f"Erreur lors de l'analyse XML : {e}")
-        return {}
+        except requests.RequestException as e:
+            print(f"Erreur de requête : {e}")
 
 
     
