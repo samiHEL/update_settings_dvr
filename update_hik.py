@@ -303,7 +303,7 @@ def get_camera_parameters(camera_ip, username, password, channel_id, cam):
             response = requests.get(url_image_settings, auth=HTTPDigestAuth(username, password))
             response_motion = requests.get(url_motion_get, auth=HTTPDigestAuth(username, password))
             response_encrypt = requests.get(url_encrypt, auth=HTTPDigestAuth(username, password))
-            if response.status_code == 200 and response_motion.status_code == 200 and response_encrypt.status_code == 200 :
+            if response.status_code == 200 :
                 xml = response.text
                 xml2 = response_motion.text
                 xml3 = response_encrypt.text
